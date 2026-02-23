@@ -2,381 +2,210 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shahin Tech BD</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#f2f2f2;
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f5f5f5;
 }
 
-/* HEADER */
-header{
-background:#0b1f3a;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:12px;
-color:white;
-position:sticky;
-top:0;
-z-index:1000;
+/* Header */
+.header{
+  background:#0f2a56;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.brand-name{
-font-size:20px;
-font-weight:bold;
+.header h2{
+  margin:0;
+  font-size:20px;
 }
 
-.search-box input{
-padding:8px;
-width:180px;
-border:none;
-border-radius:20px;
+.cart-count{
+  background:#ff6a00;
+  padding:4px 8px;
+  border-radius:50%;
+}
+
+/* Banner */
+.banner{
+  background:linear-gradient(90deg,#ff6a00,#ff3d00);
+  color:white;
+  text-align:center;
+  padding:12px;
+  font-weight:bold;
+}
+
+/* Product */
+.container{
+  padding:15px;
+}
+
+.product{
+  background:white;
+  border-radius:12px;
+  padding:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+  position:relative;
+}
+
+.discount{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#ff3d00;
+  color:white;
+  padding:5px 8px;
+  font-size:12px;
+  border-radius:6px;
+}
+
+.product img{
+  width:100%;
+  border-radius:10px;
+}
+
+.price{
+  margin-top:10px;
+}
+
+.new{
+  color:#ff3d00;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.old{
+  text-decoration:line-through;
+  color:gray;
+  margin-left:8px;
+}
+
+.badge{
+  background:#eee;
+  padding:4px 6px;
+  font-size:11px;
+  border-radius:6px;
+  margin-right:5px;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  margin-top:8px;
+  font-size:14px;
 }
 
 .cart-btn{
-cursor:pointer;
-font-weight:bold;
-}
-
-/* BANNER */
-.banner{
-background:linear-gradient(45deg,#0b1f3a,#1e3c72);
-color:white;
-text-align:center;
-padding:30px 10px;
-font-size:22px;
-}
-
-/* CATEGORY */
-.categories{
-display:flex;
-overflow:auto;
-padding:10px;
-background:white;
-}
-
-.categories div{
-background:#eee;
-padding:6px 12px;
-margin-right:8px;
-border-radius:20px;
-cursor:pointer;
-white-space:nowrap;
-font-size:14px;
-}
-
-.categories div:hover{
-background:#0b1f3a;
-color:white;
-}
-
-/* PRODUCTS */
-.products{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-gap:12px;
-padding:12px;
-}
-
-.card{
-background:white;
-border-radius:12px;
-padding:10px;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
-transition:0.3s;
-}
-
-.card:hover{
-transform:translateY(-4px);
-}
-
-.card img{
-width:100%;
-height:140px;
-object-fit:cover;
-border-radius:8px;
-}
-
-.card h4{
-margin:8px 0 4px;
-font-size:15px;
-}
-
-.card p{
-margin:0;
-font-weight:bold;
-}
-
-.card button{
-padding:7px;
-width:100%;
-border:none;
-margin-top:6px;
-border-radius:6px;
-cursor:pointer;
-}
-
-.add-btn{
-background:#0b1f3a;
-color:white;
+  background:#0f2a56;
+  color:white;
 }
 
 .buy-btn{
-background:#ff6a00;
-color:white;
+  background:#ff6a00;
+  color:white;
 }
 
-/* CART */
-.hidden{display:none;}
-
-.cart-page{
-padding:10px;
+/* Order Form */
+.order-box{
+  background:white;
+  padding:15px;
+  margin-top:20px;
+  border-radius:12px;
 }
 
-.cart-item{
-background:white;
-padding:10px;
-margin-bottom:8px;
-border-radius:8px;
+.order-box input, .order-box select{
+  width:100%;
+  padding:8px;
+  margin-top:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
 
-.qty-btn{
-padding:4px 8px;
-border:none;
-background:#0b1f3a;
-color:white;
-margin-right:4px;
+/* Sticky Bar */
+.sticky{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:white;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+  box-shadow:0 -3px 10px rgba(0,0,0,0.1);
 }
 
-.checkout-box{
-background:white;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-}
-
-input,select{
-padding:8px;
-width:100%;
-margin-bottom:8px;
-}
-
-/* SUCCESS */
-.success{
-position:fixed;
-top:40%;
-left:50%;
-transform:translate(-50%,-50%);
-background:white;
-padding:20px;
-border-radius:8px;
-display:none;
-box-shadow:0 0 10px rgba(0,0,0,0.3);
+.place-btn{
+  background:#ff6a00;
+  color:white;
+  padding:8px 20px;
+  border:none;
+  border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="brand-name">Shahin Tech BD</div>
-
-<div class="search-box">
-<input type="text" id="search" placeholder="Search products...">
+<div class="header">
+  <h2>Shahin Tech BD</h2>
+  <div>Cart <span class="cart-count">1</span></div>
 </div>
-
-<div class="cart-btn" onclick="showCart()">
-🛒 (<span id="cartCount">0</span>)
-</div>
-</header>
 
 <div class="banner">
-Welcome to Shahin Tech BD – Trusted Online Shop
+🔥 Flash Sale! Up to 50% OFF – Limited Time!
 </div>
 
-<div class="categories" id="categories"></div>
-<div class="products" id="productList"></div>
-<div class="cart-page hidden" id="cartPage"></div>
+<div class="container">
 
-<div class="success" id="successBox">
-<h3>🎉 Order Confirmed!</h3>
-<p>ধন্যবাদ আপনার অর্ডারের জন্য।</p>
-<button onclick="closeSuccess()">OK</button>
+  <div class="product">
+    <div class="discount">-20%</div>
+    <img src="https://picsum.photos/400">
+    <h3>Wireless Mouse</h3>
+
+    <div class="price">
+      <span class="new">৳800</span>
+      <span class="old">৳1000</span>
+    </div>
+
+    <div>
+      <span class="badge">Cash on Delivery</span>
+      <span class="badge">Free Delivery</span>
+    </div>
+
+    <button class="cart-btn">Add to Cart</button>
+    <button class="buy-btn">Buy Now</button>
+  </div>
+
+  <div class="order-box">
+    <h3>Order Now</h3>
+    <p>Subtotal: ৳800</p>
+
+    <select>
+      <option>ঢাকার ভিতরে (৳50)</option>
+      <option>ঢাকার বাইরে (৳100)</option>
+    </select>
+
+    <input type="text" placeholder="Your Name">
+    <input type="text" placeholder="Phone Number">
+    <input type="text" placeholder="Full Address">
+
+    <button class="buy-btn">Confirm Order</button>
+  </div>
+
 </div>
 
-<script>
-
-const scriptURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
-
-let products=[];
-let cart=[];
-
-fetch(scriptURL)
-.then(res=>res.json())
-.then(data=>{
-products=data;
-loadCategories();
-displayProducts(products);
-});
-
-function normalize(obj){
-let newObj={};
-for(let key in obj){
-newObj[key.toLowerCase()]=obj[key];
-}
-return newObj;
-}
-
-function loadCategories(){
-let cats=[...new Set(products.map(p=>normalize(p).category))];
-let html='<div onclick="displayProducts(products)">All</div>';
-cats.forEach(c=>{
-html+=`<div onclick="filterCategory('${c}')">${c}</div>`;
-});
-document.getElementById("categories").innerHTML=html;
-}
-
-function filterCategory(cat){
-let filtered=products.filter(p=>normalize(p).category==cat);
-displayProducts(filtered);
-}
-
-function displayProducts(list){
-let html="";
-list.forEach(p=>{
-let pr=normalize(p);
-html+=`
-<div class="card">
-<img src="${pr.image}">
-<h4>${pr.name}</h4>
-<p>৳${pr.price}</p>
-
-<button class="add-btn"
-onclick="addToCart('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">
-Add to Cart
-</button>
-
-<button class="buy-btn"
-onclick="buyNow('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">
-Buy Now
-</button>
-</div>`;
-});
-document.getElementById("productList").innerHTML=html;
-}
-
-function addToCart(id,name,price,image){
-let found=cart.find(item=>item.id==id);
-if(found){found.qty++}
-else{cart.push({id,name,price,image,qty:1})}
-updateCartCount();
-}
-
-function buyNow(id,name,price,image){
-cart=[];
-cart.push({id,name,price,image,qty:1});
-updateCartCount();
-showCart();
-}
-
-function updateCartCount(){
-document.getElementById("cartCount").innerText=
-cart.reduce((a,b)=>a+b.qty,0);
-}
-
-function showCart(){
-document.getElementById("cartPage").classList.remove("hidden");
-
-let html="";
-let subtotal=0;
-
-cart.forEach(item=>{
-subtotal+=item.price*item.qty;
-html+=`
-<div class="cart-item">
-<img src="${item.image}" width="60">
-<b>${item.name}</b>
-<p>৳${item.price} x ${item.qty}</p>
-<button class="qty-btn" onclick="changeQty('${item.id}',-1)">-</button>
-<button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
-</div>`;
-});
-
-html+=`
-<div class="checkout-box">
-<p>Subtotal: ৳${subtotal}</p>
-
-<select id="area" onchange="updateTotal(${subtotal})">
-<option value="50">জলঢাকা (50)</option>
-<option value="75">নীলফামারী (75)</option>
-<option value="120">বাংলাদেশ (120)</option>
-</select>
-
-<p>Total: ৳<span id="finalTotal">${subtotal+50}</span></p>
-
-<input id="customername" placeholder="Your Name">
-<input id="phone" placeholder="Phone">
-<input id="address" placeholder="Address">
-
-<button onclick="placeOrder(${subtotal})">Confirm Order</button>
-</div>`;
-
-document.getElementById("cartPage").innerHTML=html;
-}
-
-function changeQty(id,change){
-let item=cart.find(i=>i.id==id);
-item.qty+=change;
-if(item.qty<=0){cart=cart.filter(i=>i.id!=id)}
-showCart();
-updateCartCount();
-}
-
-function updateTotal(subtotal){
-let delivery=parseInt(document.getElementById("area").value);
-document.getElementById("finalTotal").innerText=subtotal+delivery;
-}
-
-function placeOrder(subtotal){
-let delivery=parseInt(document.getElementById("area").value);
-let total=subtotal+delivery;
-
-let productlist=cart.map(i=>`${i.name} (${i.qty}pcs)`).join(", ");
-
-let formData=new FormData();
-formData.append("customername",document.getElementById("customername").value);
-formData.append("phone",document.getElementById("phone").value);
-formData.append("address",document.getElementById("address").value);
-formData.append("productlist",productlist);
-formData.append("subtotal",subtotal);
-formData.append("delivery",delivery);
-formData.append("total",total);
-
-fetch(scriptURL,{method:"POST",body:formData})
-.then(res=>res.text())
-.then(()=>{
-cart=[];
-updateCartCount();
-document.getElementById("cartPage").classList.add("hidden");
-document.getElementById("successBox").style.display="block";
-});
-}
-
-function closeSuccess(){
-document.getElementById("successBox").style.display="none";
-}
-
-document.getElementById("search").addEventListener("input",function(){
-let value=this.value.toLowerCase();
-let filtered=products.filter(p=>normalize(p).name.toLowerCase().includes(value));
-displayProducts(filtered);
-});
-
-</script>
+<div class="sticky">
+  <div>Total: ৳850</div>
+  <button class="place-btn">Place Order</button>
+</div>
 
 </body>
 </html>
