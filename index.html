@@ -1,109 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Shahin Tech BD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shahin Tech BD</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f4f4f4;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f5f5f5;
+}
 
-    header {
-      background: black;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      font-size: 24px;
-    }
+/* Header */
+.header{
+  background:#f85606;
+  color:white;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+}
 
-    .container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
+.header h2{
+  margin:0;
+  font-size:18px;
+}
 
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+.cart{
+  background:white;
+  color:#f85606;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:14px;
+}
 
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
+/* Product Grid */
+.products{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
+}
 
-    .price {
-      color: green;
-      font-size: 18px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
+.card{
+  background:white;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  position:relative;
+}
 
-    button {
-      background: black;
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-    }
+.card img{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+}
 
-    button:hover {
-      background: #333;
-    }
-  </style>
+.badge{
+  position:absolute;
+  top:8px;
+  left:8px;
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:3px 6px;
+  border-radius:4px;
+}
+
+.discount{
+  position:absolute;
+  top:8px;
+  right:8px;
+  background:#f85606;
+  color:white;
+  font-size:12px;
+  padding:3px 6px;
+  border-radius:4px;
+}
+
+.card-body{
+  padding:8px;
+}
+
+.card-body h4{
+  font-size:14px;
+  margin:5px 0;
+  height:34px;
+  overflow:hidden;
+}
+
+.price{
+  color:#f85606;
+  font-weight:bold;
+}
+
+.old-price{
+  text-decoration:line-through;
+  color:gray;
+  font-size:12px;
+}
+
+button{
+  width:100%;
+  background:#f85606;
+  color:white;
+  border:none;
+  padding:8px;
+  margin-top:5px;
+  border-radius:4px;
+  font-size:14px;
+}
+</style>
 </head>
 
 <body>
 
-<header>Shahin Tech BD</header>
+<div class="header">
+  <h2>Shahin Tech BD</h2>
+  <div class="cart">Cart: <span id="cartCount">0</span></div>
+</div>
 
-<div class="container" id="products"></div>
+<div class="products" id="products"></div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbyk0-LlA2LugHdTSZ5jc9HPcSKCTVAlfsqUIP_rppELXMF4h4WAM2CHJfIDtRkyAuY/exec";
 
-async function loadProducts() {
-  try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
+let cart = 0;
 
-    let html = "";
+async function loadProducts(){
+  const res = await fetch(API_URL);
+  const data = await res.json();
 
-    data.forEach(product => {
-      if(product.Status === "Show") {
-        html += `
-          <div class="card">
-            <img src="${product.Image}" alt="${product.Name}">
-            <h3>${product.Name}</h3>
-            <div class="price">৳ ${product.Price}</div>
-            <button onclick="addToCart('${product.Name}')">Add to Cart</button>
-          </div>
-        `;
-      }
-    });
+  let html = "";
 
-    document.getElementById("products").innerHTML = html;
+  data.forEach(p=>{
+    if(p.Status==="Show"){
+      html += `
+      <div class="card">
+        ${p.Badge ? `<div class="badge">${p.Badge}</div>` : ""}
+        ${p.Discount ? `<div class="discount">-${p.Discount}%</div>` : ""}
+        <img src="${p.Image}">
+        <div class="card-body">
+          <h4>${p.Name}</h4>
+          <div class="price">৳ ${p.Price}</div>
+          ${p.OldPrice ? `<div class="old-price">৳ ${p.OldPrice}</div>` : ""}
+          <button onclick="addToCart()">Add to Cart</button>
+        </div>
+      </div>
+      `;
+    }
+  });
 
-  } catch (error) {
-    document.getElementById("products").innerHTML =
-      "<p style='color:red;text-align:center;'>Product Load Failed ❌</p>";
-  }
+  document.getElementById("products").innerHTML = html;
 }
 
-function addToCart(name) {
-  alert(name + " added to cart ✅");
+function addToCart(){
+  cart++;
+  document.getElementById("cartCount").innerText = cart;
 }
 
 loadProducts();
