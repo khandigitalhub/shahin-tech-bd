@@ -6,171 +6,212 @@
 <title>Shahin Tech BD</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f2f2f2;}
-.header{background:#ff6a00;color:white;padding:15px;text-align:center;font-size:22px;font-weight:bold;}
-.banner img{width:100%;display:block;}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
-.card{background:white;border-radius:10px;padding:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);position:relative;}
-.card img{width:100%;border-radius:8px;}
-.badge{position:absolute;top:8px;left:8px;background:red;color:white;font-size:11px;padding:3px 6px;border-radius:5px;}
-.price{color:#ff6a00;font-weight:bold;}
-.oldprice{text-decoration:line-through;color:gray;font-size:12px;}
-button{width:100%;background:#ff6a00;color:white;border:none;padding:8px;border-radius:6px;margin-top:5px;cursor:pointer;}
-.checkout{background:white;margin:10px;padding:10px;border-radius:10px;}
-input,select,textarea{width:100%;padding:8px;margin-bottom:8px;border:1px solid #ccc;border-radius:6px;}
-.totalbox{background:#fff3e6;padding:8px;border-radius:6px;font-weight:bold;}
-
-/* Popup */
-.popup{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-justify-content:center;
-align-items:center;
-}
-.popup-content{
-background:white;
-padding:20px;
-border-radius:10px;
-text-align:center;
-width:80%;
-max-width:300px;
-animation:fadeIn 0.3s ease;
-}
-@keyframes fadeIn{
-from{transform:scale(0.8);opacity:0;}
-to{transform:scale(1);opacity:1;}
-}
-.popup button{
-margin-top:15px;
-}
+body{margin:0;font-family:Arial;background:#f5f5f5}
+.header{background:#ff6a00;padding:10px;position:sticky;top:0;z-index:1000}
+.search-box{background:white;border-radius:30px;display:flex;align-items:center;padding:8px 15px}
+.search-box input{border:none;outline:none;flex:1}
+.banner{width:100%;overflow:hidden}
+.banner img{width:100%;height:150px;object-fit:cover}
+.categories{display:flex;overflow:auto;gap:10px;background:white;padding:10px}
+.categories button{border:none;background:#fff3e6;padding:8px 15px;border-radius:20px}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+.card{background:white;border-radius:10px;padding:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);position:relative}
+.card img{width:100%;border-radius:8px}
+.price{color:#ff6a00;font-weight:bold}
+.old{text-decoration:line-through;color:gray;font-size:12px}
+.badge{position:absolute;top:8px;left:8px;background:red;color:white;font-size:10px;padding:3px 6px;border-radius:10px}
+button{background:#ff6a00;color:white;border:none;padding:8px;border-radius:6px;margin-top:5px;width:100%}
+.bottom{position:fixed;bottom:0;width:100%;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 5px rgba(0,0,0,.2)}
+.cart-count{position:absolute;top:5px;right:20px;background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center}
+.modal-content{background:white;width:95%;max-height:95%;overflow:auto;border-radius:10px;padding:15px}
+input,select{width:100%;padding:8px;margin:5px 0}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:black;color:white;padding:10px 20px;border-radius:20px;display:none}
+.footer{background:#222;color:white;padding:20px;font-size:13px;margin-top:20px}
 </style>
 </head>
-
 <body>
 
-<div class="header">Shahin Tech BD</div>
+<div class="header">
+<div class="search-box">
+<input type="text" placeholder="Search products..." onkeyup="searchProduct(this.value)">
+</div>
+</div>
 
 <div class="banner">
-<img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80">
+<img src="https://i.imgur.com/7YQZ6Fh.jpg">
 </div>
 
+<div class="categories" id="categoryList"></div>
 <div class="products" id="productList"></div>
 
-<div class="checkout">
-<h3>Checkout</h3>
-
-<input type="text" id="custName" placeholder="Your Name">
-<input type="text" id="custPhone" placeholder="Phone Number">
-<textarea id="custAddress" placeholder="Full Address"></textarea>
-
-<select id="payment">
-<option>Cash On Delivery</option>
-<option>bKash</option>
-<option>Nagad</option>
-<option>Rocket</option>
-</select>
-
-<div class="totalbox">
-Product: <span id="productPrice">0</span> ৳
+<div class="footer">
+<h3>Shahin Tech BD</h3>
+<p>Phone: +8801777127628</p>
+<p>Email: onlinebusinesservice24@gmail.com</p>
+<p>Address: পাঠানপাড়া বাজার, জলঢাকা, নীলফামারী</p>
+<p>Delivery: জলঢাকা ৫০৳ | নীলফামারী ৭৫৳ | বাংলাদেশ ১২০৳</p>
+<p>Privacy Policy | Return Policy | Terms & Conditions</p>
 </div>
 
-<button onclick="placeOrder()">Place Order</button>
+<div class="bottom">
+<div onclick="goHome()">Home</div>
+<div onclick="openCart()">Cart <span id="cartCount" class="cart-count">0</span></div>
 </div>
 
-<!-- Popup -->
-<div class="popup" id="orderPopup">
-<div class="popup-content">
-<h3>🎉 Order Confirmed!</h3>
-<p id="orderMessage"></p>
-<button onclick="closePopup()">OK</button>
+<div class="modal" id="modal">
+<div class="modal-content" id="modalContent"></div>
 </div>
-</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 
 const sheetURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
 
-let selectedProduct="";
-let selectedPrice=0;
+let products=[];
+let cart=[];
 
 fetch(sheetURL)
 .then(res=>res.json())
 .then(data=>{
-const container=document.getElementById("productList");
-container.innerHTML="";
+products=data.filter(p=>p.status && p.status.toLowerCase()=="show");
+createCategories();
+renderProducts(products);
+});
 
+function createCategories(){
+let cats=[...new Set(products.map(p=>p.category))];
+let html=`<button onclick="renderProducts(products)">All</button>`;
+cats.forEach(c=>{html+=`<button onclick="filterCategory('${c}')">${c}</button>`});
+document.getElementById("categoryList").innerHTML=html;
+}
+
+function renderProducts(data){
+let html="";
+if(data.length==0){html="<p>No Product Found</p>"}
 data.forEach(p=>{
-if(!p.status || p.status.toLowerCase()!=="show") return;
-
-const card=document.createElement("div");
-card.className="card";
-
-card.innerHTML=`
+html+=`
+<div class="card">
 ${p.badge?`<div class="badge">${p.badge}</div>`:""}
-<img src="${p.image}">
+<img src="${p.image}" onclick='openDetails(${JSON.stringify(p)})'>
 <h4>${p.name}</h4>
 <div class="price">৳ ${p.price}</div>
-${p.oldprice?`<div class="oldprice">৳ ${p.oldprice}</div>`:""}
-<button onclick="selectProduct('${p.name}',${p.price})">Buy Now</button>
+${p.oldprice?`<div class="old">৳ ${p.oldprice}</div>`:""}
+<button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+<button onclick='buyNow(${JSON.stringify(p)})'>Buy Now</button>
+</div>`;
+});
+document.getElementById("productList").innerHTML=html;
+}
+
+function filterCategory(cat){renderProducts(products.filter(p=>p.category==cat))}
+function searchProduct(val){
+val=val.toLowerCase();
+renderProducts(products.filter(p=>p.name.toLowerCase().includes(val)||p.category.toLowerCase().includes(val)));
+}
+
+function addToCart(p){
+cart.push(p);
+document.getElementById("cartCount").innerText=cart.length;
+showToast("Added to cart");
+}
+
+function openCart(){
+if(cart.length==0){showToast("Cart is empty");return;}
+let html="<h3>Your Cart</h3>";
+cart.forEach((p,i)=>{
+html+=`
+<p>${p.name} - ৳ ${p.price}</p>
+<button onclick="removeCart(${i})">Remove</button>
 `;
-
-container.appendChild(card);
 });
-});
-
-function selectProduct(name,price){
-selectedProduct=name;
-selectedPrice=parseInt(price);
-document.getElementById("productPrice").innerText=selectedPrice;
-alert(name+" selected");
+html+=`<button onclick="checkout()">Proceed to Checkout</button>`;
+openModal(html);
 }
 
-function placeOrder(){
-
-if(!selectedProduct){
-alert("Please select product");
-return;
+function removeCart(i){
+cart.splice(i,1);
+document.getElementById("cartCount").innerText=cart.length;
+openCart();
 }
 
-let orderID="ORD-"+Date.now();
-let date=new Date().toLocaleString();
+function checkout(){
+openModal(`
+<h3>Checkout</h3>
+<label>Name</label>
+<input id="cName">
+<label>Phone</label>
+<input id="cPhone">
+<label>Address</label>
+<input id="cAddress">
+<label>Delivery Area</label>
+<select id="cArea">
+<option value="50">জলঢাকা (50৳)</option>
+<option value="75">নীলফামারী (75৳)</option>
+<option value="120">বাংলাদেশ (120৳)</option>
+</select>
+<label>Payment</label>
+<select id="cPay">
+<option>Cash On Delivery</option>
+<option>Bkash</option>
+<option>Nagad</option>
+<option>Rocket</option>
+</select>
+<button onclick="confirmOrder()">Confirm Order</button>
+`);
+}
 
-const orderData={
-OrderID:orderID,
-Date:date,
-CustomerName:document.getElementById("custName").value,
-Phone:document.getElementById("custPhone").value,
-Address:document.getElementById("custAddress").value,
-PaymentMethod:document.getElementById("payment").value,
-ProductList:selectedProduct+" (৳"+selectedPrice+")",
+function confirmOrder(){
+let total=cart.reduce((sum,p)=>sum+parseInt(p.price),0);
+let delivery=parseInt(document.getElementById("cArea").value);
+let finalTotal=total+delivery;
+
+let order={
+CustomerName:document.getElementById("cName").value,
+Phone:document.getElementById("cPhone").value,
+Address:document.getElementById("cAddress").value,
+PaymentMethod:document.getElementById("cPay").value,
+ProductList:JSON.stringify(cart),
 Status:"Pending"
 };
 
-fetch(sheetURL,{
-method:"POST",
-body:JSON.stringify(orderData)
-})
-.then(res=>res.text())
+fetch(sheetURL,{method:"POST",body:JSON.stringify(order)})
 .then(()=>{
-
-document.getElementById("orderMessage").innerHTML=
-"Thank you for your order ❤️<br><br>Your Order ID:<br><b>"+orderID+"</b><br><br>We will contact you soon.";
-
-document.getElementById("orderPopup").style.display="flex";
-
+cart=[];
+document.getElementById("cartCount").innerText=0;
+closeModal();
+showToast("🎉 Order Confirmed! Total ৳ "+finalTotal);
 });
 }
 
-function closePopup(){
-location.reload();
+function buyNow(p){cart=[p];checkout()}
+
+function openDetails(p){
+openModal(`
+<h3>${p.name}</h3>
+<img src="${p.image}" style="width:100%">
+<p>${p.description||""}</p>
+<div class="price">৳ ${p.price}</div>
+<button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+`);
+}
+
+function openModal(html){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalContent").innerHTML=html+`<button onclick="closeModal()">Close</button>`;
+}
+
+function closeModal(){document.getElementById("modal").style.display="none"}
+function goHome(){renderProducts(products)}
+
+function showToast(msg){
+let t=document.getElementById("toast");
+t.innerText=msg;
+t.style.display="block";
+setTimeout(()=>{t.style.display="none"},2000);
 }
 
 </script>
-
 </body>
 </html>
