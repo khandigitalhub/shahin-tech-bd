@@ -2,48 +2,204 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Smart Shop</title>
+<title>Shahin Tech BD</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f5f5}
-header{background:#ff6a00;padding:10px;color:white;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:20px;font-weight:bold}
-.search-box input{padding:7px;width:220px;border:none;border-radius:4px}
-.cart-btn{cursor:pointer;font-weight:bold}
-.banner{background:linear-gradient(45deg,#ff6a00,#ffb347);color:white;padding:40px;text-align:center;font-size:24px}
-.categories{display:flex;overflow:auto;background:white;padding:10px}
-.categories div{margin-right:15px;cursor:pointer;font-weight:bold}
-.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:10px}
-.card{background:white;padding:10px;border-radius:6px}
-.card img{width:100%;height:140px;object-fit:cover}
-.card button{background:#ff6a00;color:white;border:none;padding:6px;width:100%;margin-top:5px;cursor:pointer}
-.hidden{display:none}
-.cart-page{padding:10px}
-.cart-item{background:white;padding:10px;margin-bottom:8px}
-.qty-btn{padding:3px 7px;background:#ff6a00;color:white;border:none}
-.checkout-box{background:white;padding:10px;margin-top:10px}
-input,select{padding:7px;width:100%;margin-bottom:8px}
-.success{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);
-background:white;padding:20px;border-radius:8px;display:none}
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#f2f2f2;
+}
+
+/* HEADER */
+header{
+background:#0b1f3a;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px;
+color:white;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.brand-name{
+font-size:20px;
+font-weight:bold;
+}
+
+.search-box input{
+padding:8px;
+width:180px;
+border:none;
+border-radius:20px;
+}
+
+.cart-btn{
+cursor:pointer;
+font-weight:bold;
+}
+
+/* BANNER */
+.banner{
+background:linear-gradient(45deg,#0b1f3a,#1e3c72);
+color:white;
+text-align:center;
+padding:30px 10px;
+font-size:22px;
+}
+
+/* CATEGORY */
+.categories{
+display:flex;
+overflow:auto;
+padding:10px;
+background:white;
+}
+
+.categories div{
+background:#eee;
+padding:6px 12px;
+margin-right:8px;
+border-radius:20px;
+cursor:pointer;
+white-space:nowrap;
+font-size:14px;
+}
+
+.categories div:hover{
+background:#0b1f3a;
+color:white;
+}
+
+/* PRODUCTS */
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:12px;
+padding:12px;
+}
+
+.card{
+background:white;
+border-radius:12px;
+padding:10px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+}
+
+.card img{
+width:100%;
+height:140px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.card h4{
+margin:8px 0 4px;
+font-size:15px;
+}
+
+.card p{
+margin:0;
+font-weight:bold;
+}
+
+.card button{
+padding:7px;
+width:100%;
+border:none;
+margin-top:6px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.add-btn{
+background:#0b1f3a;
+color:white;
+}
+
+.buy-btn{
+background:#ff6a00;
+color:white;
+}
+
+/* CART */
+.hidden{display:none;}
+
+.cart-page{
+padding:10px;
+}
+
+.cart-item{
+background:white;
+padding:10px;
+margin-bottom:8px;
+border-radius:8px;
+}
+
+.qty-btn{
+padding:4px 8px;
+border:none;
+background:#0b1f3a;
+color:white;
+margin-right:4px;
+}
+
+.checkout-box{
+background:white;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+}
+
+input,select{
+padding:8px;
+width:100%;
+margin-bottom:8px;
+}
+
+/* SUCCESS */
+.success{
+position:fixed;
+top:40%;
+left:50%;
+transform:translate(-50%,-50%);
+background:white;
+padding:20px;
+border-radius:8px;
+display:none;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
 </style>
 </head>
+
 <body>
 
 <header>
-<div class="logo">Smart Shop</div>
-<div class="search-box"><input type="text" id="search" placeholder="Search products..."></div>
-<div class="cart-btn" onclick="showCart()">🛒 Cart (<span id="cartCount">0</span>)</div>
+<div class="brand-name">Shahin Tech BD</div>
+
+<div class="search-box">
+<input type="text" id="search" placeholder="Search products...">
+</div>
+
+<div class="cart-btn" onclick="showCart()">
+🛒 (<span id="cartCount">0</span>)
+</div>
 </header>
 
 <div class="banner">
-Welcome to Smart Shop – Best Online Deals
+Welcome to Shahin Tech BD – Trusted Online Shop
 </div>
 
 <div class="categories" id="categories"></div>
-
 <div class="products" id="productList"></div>
-
 <div class="cart-page hidden" id="cartPage"></div>
 
 <div class="success" id="successBox">
@@ -55,6 +211,7 @@ Welcome to Smart Shop – Best Online Deals
 <script>
 
 const scriptURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
+
 let products=[];
 let cart=[];
 
@@ -97,7 +254,16 @@ html+=`
 <img src="${pr.image}">
 <h4>${pr.name}</h4>
 <p>৳${pr.price}</p>
-<button onclick="addToCart('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">Add to Cart</button>
+
+<button class="add-btn"
+onclick="addToCart('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">
+Add to Cart
+</button>
+
+<button class="buy-btn"
+onclick="buyNow('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">
+Buy Now
+</button>
 </div>`;
 });
 document.getElementById("productList").innerHTML=html;
@@ -110,14 +276,24 @@ else{cart.push({id,name,price,image,qty:1})}
 updateCartCount();
 }
 
+function buyNow(id,name,price,image){
+cart=[];
+cart.push({id,name,price,image,qty:1});
+updateCartCount();
+showCart();
+}
+
 function updateCartCount(){
-document.getElementById("cartCount").innerText=cart.reduce((a,b)=>a+b.qty,0);
+document.getElementById("cartCount").innerText=
+cart.reduce((a,b)=>a+b.qty,0);
 }
 
 function showCart(){
 document.getElementById("cartPage").classList.remove("hidden");
+
 let html="";
 let subtotal=0;
+
 cart.forEach(item=>{
 subtotal+=item.price*item.qty;
 html+=`
@@ -129,21 +305,26 @@ html+=`
 <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
 </div>`;
 });
+
 html+=`
 <div class="checkout-box">
 <p>Subtotal: ৳${subtotal}</p>
+
 <select id="area" onchange="updateTotal(${subtotal})">
 <option value="50">জলঢাকা (50)</option>
 <option value="75">নীলফামারী (75)</option>
 <option value="120">বাংলাদেশ (120)</option>
 </select>
+
 <p>Total: ৳<span id="finalTotal">${subtotal+50}</span></p>
-<h4>Checkout</h4>
+
 <input id="customername" placeholder="Your Name">
 <input id="phone" placeholder="Phone">
 <input id="address" placeholder="Address">
+
 <button onclick="placeOrder(${subtotal})">Confirm Order</button>
 </div>`;
+
 document.getElementById("cartPage").innerHTML=html;
 }
 
