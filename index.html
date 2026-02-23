@@ -1,109 +1,175 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Shahin Tech BD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shahin Tech BD</title>
 
-  <style>
-    body { font-family: Arial; margin: 0; background:#f4f4f4; }
-    header { background:#ff6600; color:white; padding:15px; text-align:center; font-size:20px; }
-    .container { padding:15px; }
-    .card {
-      background:white;
-      padding:15px;
-      border-radius:10px;
-      margin-bottom:15px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.1);
-    }
-    button {
-      background:#ff6600;
-      color:white;
-      border:none;
-      padding:10px;
-      width:100%;
-      border-radius:5px;
-      font-size:16px;
-    }
-    input, textarea, select {
-      width:100%;
-      padding:10px;
-      margin-bottom:10px;
-    }
-  </style>
+<style>
+body{margin:0;font-family:Arial;background:#f2f2f2;}
+.header{background:#ff6a00;color:white;padding:15px;text-align:center;font-size:22px;font-weight:bold;}
+.banner img{width:100%;display:block;}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
+.card{background:white;border-radius:10px;padding:8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);position:relative;}
+.card img{width:100%;border-radius:8px;}
+.badge{position:absolute;top:8px;left:8px;background:red;color:white;font-size:11px;padding:3px 6px;border-radius:5px;}
+.price{color:#ff6a00;font-weight:bold;}
+.oldprice{text-decoration:line-through;color:gray;font-size:12px;}
+button{width:100%;background:#ff6a00;color:white;border:none;padding:8px;border-radius:6px;margin-top:5px;cursor:pointer;}
+.checkout{background:white;margin:10px;padding:10px;border-radius:10px;}
+input,select,textarea{width:100%;padding:8px;margin-bottom:8px;border:1px solid #ccc;border-radius:6px;}
+.totalbox{background:#fff3e6;padding:8px;border-radius:6px;font-weight:bold;}
+
+/* Popup */
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+}
+.popup-content{
+background:white;
+padding:20px;
+border-radius:10px;
+text-align:center;
+width:80%;
+max-width:300px;
+animation:fadeIn 0.3s ease;
+}
+@keyframes fadeIn{
+from{transform:scale(0.8);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+.popup button{
+margin-top:15px;
+}
+</style>
 </head>
+
 <body>
 
-<header>Shahin Tech BD</header>
+<div class="header">Shahin Tech BD</div>
 
-<div class="container" id="products"></div>
+<div class="banner">
+<img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1200&q=80">
+</div>
 
-<div class="container">
-  <h3>Checkout</h3>
-  <input type="text" id="name" placeholder="Your Name">
-  <input type="text" id="phone" placeholder="Phone Number">
-  <textarea id="address" placeholder="Address"></textarea>
-  <select id="payment">
-    <option value="Cash On Delivery">Cash On Delivery</option>
-  </select>
-  <button onclick="submitOrder()">Place Order</button>
+<div class="products" id="productList"></div>
+
+<div class="checkout">
+<h3>Checkout</h3>
+
+<input type="text" id="custName" placeholder="Your Name">
+<input type="text" id="custPhone" placeholder="Phone Number">
+<textarea id="custAddress" placeholder="Full Address"></textarea>
+
+<select id="payment">
+<option>Cash On Delivery</option>
+<option>bKash</option>
+<option>Nagad</option>
+<option>Rocket</option>
+</select>
+
+<div class="totalbox">
+Product: <span id="productPrice">0</span> ৳
+</div>
+
+<button onclick="placeOrder()">Place Order</button>
+</div>
+
+<!-- Popup -->
+<div class="popup" id="orderPopup">
+<div class="popup-content">
+<h3>🎉 Order Confirmed!</h3>
+<p id="orderMessage"></p>
+<button onclick="closePopup()">OK</button>
+</div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
 
-let cart = [];
+const sheetURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
 
-fetch(API_URL)
-.then(res => res.json())
-.then(data => {
-  const container = document.getElementById("products");
-  data.forEach(product => {
-    container.innerHTML += `
-      <div class="card">
-        <h3>${product.name}</h3>
-        <p>৳ ${product.price}</p>
-        <button onclick='addToCart("${product.name}", ${product.price})'>Add to Cart</button>
-      </div>
-    `;
-  });
+let selectedProduct="";
+let selectedPrice=0;
+
+fetch(sheetURL)
+.then(res=>res.json())
+.then(data=>{
+const container=document.getElementById("productList");
+container.innerHTML="";
+
+data.forEach(p=>{
+if(!p.status || p.status.toLowerCase()!=="show") return;
+
+const card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+${p.badge?`<div class="badge">${p.badge}</div>`:""}
+<img src="${p.image}">
+<h4>${p.name}</h4>
+<div class="price">৳ ${p.price}</div>
+${p.oldprice?`<div class="oldprice">৳ ${p.oldprice}</div>`:""}
+<button onclick="selectProduct('${p.name}',${p.price})">Buy Now</button>
+`;
+
+container.appendChild(card);
+});
 });
 
-function addToCart(name, price) {
-  cart.push({name, price});
-  alert("Added to Cart");
+function selectProduct(name,price){
+selectedProduct=name;
+selectedPrice=parseInt(price);
+document.getElementById("productPrice").innerText=selectedPrice;
+alert(name+" selected");
 }
 
-function submitOrder() {
-  if(cart.length === 0){
-    alert("Cart is empty");
-    return;
-  }
+function placeOrder(){
 
-  const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
-
-  const orderData = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    address: document.getElementById("address").value,
-    payment: document.getElementById("payment").value,
-    products: JSON.stringify(cart),
-    total: total
-  };
-
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(orderData)
-  })
-  .then(res => res.json())
-  .then(response => {
-    alert("Order Placed Successfully!");
-    cart = [];
-  })
-  .catch(err => {
-    alert("Error placing order");
-  });
+if(!selectedProduct){
+alert("Please select product");
+return;
 }
+
+let orderID="ORD-"+Date.now();
+let date=new Date().toLocaleString();
+
+const orderData={
+OrderID:orderID,
+Date:date,
+CustomerName:document.getElementById("custName").value,
+Phone:document.getElementById("custPhone").value,
+Address:document.getElementById("custAddress").value,
+PaymentMethod:document.getElementById("payment").value,
+ProductList:selectedProduct+" (৳"+selectedPrice+")",
+Status:"Pending"
+};
+
+fetch(sheetURL,{
+method:"POST",
+body:JSON.stringify(orderData)
+})
+.then(res=>res.text())
+.then(()=>{
+
+document.getElementById("orderMessage").innerHTML=
+"Thank you for your order ❤️<br><br>Your Order ID:<br><b>"+orderID+"</b><br><br>We will contact you soon.";
+
+document.getElementById("orderPopup").style.display="flex";
+
+});
+}
+
+function closePopup(){
+location.reload();
+}
+
 </script>
 
 </body>
