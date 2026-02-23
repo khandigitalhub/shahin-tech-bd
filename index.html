@@ -2,216 +2,200 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shahin Tech BD</title>
+<title>Smart Shop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{margin:0;font-family:Arial;background:#f5f5f5}
-.header{background:#ff6a00;padding:10px;position:sticky;top:0;z-index:1000}
-.search-box{background:white;border-radius:30px;display:flex;align-items:center;padding:8px 15px}
-.search-box input{border:none;outline:none;flex:1}
-.banner{width:100%;overflow:hidden}
-.banner img{width:100%;height:150px;object-fit:cover}
-.categories{display:flex;overflow:auto;gap:10px;background:white;padding:10px}
-.categories button{border:none;background:#fff3e6;padding:8px 15px;border-radius:20px}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
-.card{background:white;border-radius:10px;padding:8px;box-shadow:0 2px 6px rgba(0,0,0,.1);position:relative}
-.card img{width:100%;border-radius:8px}
-.price{color:#ff6a00;font-weight:bold}
-.old{text-decoration:line-through;color:gray;font-size:12px}
-.badge{position:absolute;top:8px;left:8px;background:red;color:white;font-size:10px;padding:3px 6px;border-radius:10px}
-button{background:#ff6a00;color:white;border:none;padding:8px;border-radius:6px;margin-top:5px;width:100%}
-.bottom{position:fixed;bottom:0;width:100%;background:white;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -2px 5px rgba(0,0,0,.2)}
-.cart-count{position:absolute;top:5px;right:20px;background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center}
-.modal-content{background:white;width:95%;max-height:95%;overflow:auto;border-radius:10px;padding:15px}
-input,select{width:100%;padding:8px;margin:5px 0}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:black;color:white;padding:10px 20px;border-radius:20px;display:none}
-.footer{background:#222;color:white;padding:20px;font-size:13px;margin-top:20px}
+header{background:#ff6a00;padding:10px;color:white;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:20px;font-weight:bold}
+.search-box input{padding:7px;width:220px;border:none;border-radius:4px}
+.cart-btn{cursor:pointer;font-weight:bold}
+.banner{background:linear-gradient(45deg,#ff6a00,#ffb347);color:white;padding:40px;text-align:center;font-size:24px}
+.categories{display:flex;overflow:auto;background:white;padding:10px}
+.categories div{margin-right:15px;cursor:pointer;font-weight:bold}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:10px}
+.card{background:white;padding:10px;border-radius:6px}
+.card img{width:100%;height:140px;object-fit:cover}
+.card button{background:#ff6a00;color:white;border:none;padding:6px;width:100%;margin-top:5px;cursor:pointer}
+.hidden{display:none}
+.cart-page{padding:10px}
+.cart-item{background:white;padding:10px;margin-bottom:8px}
+.qty-btn{padding:3px 7px;background:#ff6a00;color:white;border:none}
+.checkout-box{background:white;padding:10px;margin-top:10px}
+input,select{padding:7px;width:100%;margin-bottom:8px}
+.success{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);
+background:white;padding:20px;border-radius:8px;display:none}
 </style>
 </head>
 <body>
 
-<div class="header">
-<div class="search-box">
-<input type="text" placeholder="Search products..." onkeyup="searchProduct(this.value)">
-</div>
-</div>
+<header>
+<div class="logo">Smart Shop</div>
+<div class="search-box"><input type="text" id="search" placeholder="Search products..."></div>
+<div class="cart-btn" onclick="showCart()">🛒 Cart (<span id="cartCount">0</span>)</div>
+</header>
 
 <div class="banner">
-<img src="https://i.imgur.com/7YQZ6Fh.jpg">
+Welcome to Smart Shop – Best Online Deals
 </div>
 
-<div class="categories" id="categoryList"></div>
+<div class="categories" id="categories"></div>
+
 <div class="products" id="productList"></div>
 
-<div class="footer">
-<h3>Shahin Tech BD</h3>
-<p>Phone: +8801777127628</p>
-<p>Email: onlinebusinesservice24@gmail.com</p>
-<p>Address: পাঠানপাড়া বাজার, জলঢাকা, নীলফামারী</p>
-<p>Delivery: জলঢাকা ৫০৳ | নীলফামারী ৭৫৳ | বাংলাদেশ ১২০৳</p>
-<p>Privacy Policy | Return Policy | Terms & Conditions</p>
-</div>
+<div class="cart-page hidden" id="cartPage"></div>
 
-<div class="bottom">
-<div onclick="goHome()">Home</div>
-<div onclick="openCart()">Cart <span id="cartCount" class="cart-count">0</span></div>
+<div class="success" id="successBox">
+<h3>🎉 Order Confirmed!</h3>
+<p>ধন্যবাদ আপনার অর্ডারের জন্য।</p>
+<button onclick="closeSuccess()">OK</button>
 </div>
-
-<div class="modal" id="modal">
-<div class="modal-content" id="modalContent"></div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 
-const sheetURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
-
+const scriptURL="https://script.google.com/macros/s/AKfycbxsJm5bOqhSJSbT-mrhlCV4lBAhNvWuL5HiejIYH7GrqUo-M4wg7DXm29ePapMot2iq/exec";
 let products=[];
 let cart=[];
 
-fetch(sheetURL)
+fetch(scriptURL)
 .then(res=>res.json())
 .then(data=>{
-products=data.filter(p=>p.status && p.status.toLowerCase()=="show");
-createCategories();
-renderProducts(products);
+products=data;
+loadCategories();
+displayProducts(products);
 });
 
-function createCategories(){
-let cats=[...new Set(products.map(p=>p.category))];
-let html=`<button onclick="renderProducts(products)">All</button>`;
-cats.forEach(c=>{html+=`<button onclick="filterCategory('${c}')">${c}</button>`});
-document.getElementById("categoryList").innerHTML=html;
+function normalize(obj){
+let newObj={};
+for(let key in obj){
+newObj[key.toLowerCase()]=obj[key];
+}
+return newObj;
 }
 
-function renderProducts(data){
+function loadCategories(){
+let cats=[...new Set(products.map(p=>normalize(p).category))];
+let html='<div onclick="displayProducts(products)">All</div>';
+cats.forEach(c=>{
+html+=`<div onclick="filterCategory('${c}')">${c}</div>`;
+});
+document.getElementById("categories").innerHTML=html;
+}
+
+function filterCategory(cat){
+let filtered=products.filter(p=>normalize(p).category==cat);
+displayProducts(filtered);
+}
+
+function displayProducts(list){
 let html="";
-if(data.length==0){html="<p>No Product Found</p>"}
-data.forEach(p=>{
+list.forEach(p=>{
+let pr=normalize(p);
 html+=`
 <div class="card">
-${p.badge?`<div class="badge">${p.badge}</div>`:""}
-<img src="${p.image}" onclick='openDetails(${JSON.stringify(p)})'>
-<h4>${p.name}</h4>
-<div class="price">৳ ${p.price}</div>
-${p.oldprice?`<div class="old">৳ ${p.oldprice}</div>`:""}
-<button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
-<button onclick='buyNow(${JSON.stringify(p)})'>Buy Now</button>
+<img src="${pr.image}">
+<h4>${pr.name}</h4>
+<p>৳${pr.price}</p>
+<button onclick="addToCart('${pr.id}','${pr.name}',${pr.price},'${pr.image}')">Add to Cart</button>
 </div>`;
 });
 document.getElementById("productList").innerHTML=html;
 }
 
-function filterCategory(cat){renderProducts(products.filter(p=>p.category==cat))}
-function searchProduct(val){
-val=val.toLowerCase();
-renderProducts(products.filter(p=>p.name.toLowerCase().includes(val)||p.category.toLowerCase().includes(val)));
+function addToCart(id,name,price,image){
+let found=cart.find(item=>item.id==id);
+if(found){found.qty++}
+else{cart.push({id,name,price,image,qty:1})}
+updateCartCount();
 }
 
-function addToCart(p){
-cart.push(p);
-document.getElementById("cartCount").innerText=cart.length;
-showToast("Added to cart");
+function updateCartCount(){
+document.getElementById("cartCount").innerText=cart.reduce((a,b)=>a+b.qty,0);
 }
 
-function openCart(){
-if(cart.length==0){showToast("Cart is empty");return;}
-let html="<h3>Your Cart</h3>";
-cart.forEach((p,i)=>{
+function showCart(){
+document.getElementById("cartPage").classList.remove("hidden");
+let html="";
+let subtotal=0;
+cart.forEach(item=>{
+subtotal+=item.price*item.qty;
 html+=`
-<p>${p.name} - ৳ ${p.price}</p>
-<button onclick="removeCart(${i})">Remove</button>
-`;
+<div class="cart-item">
+<img src="${item.image}" width="60">
+<b>${item.name}</b>
+<p>৳${item.price} x ${item.qty}</p>
+<button class="qty-btn" onclick="changeQty('${item.id}',-1)">-</button>
+<button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+</div>`;
 });
-html+=`<button onclick="checkout()">Proceed to Checkout</button>`;
-openModal(html);
-}
-
-function removeCart(i){
-cart.splice(i,1);
-document.getElementById("cartCount").innerText=cart.length;
-openCart();
-}
-
-function checkout(){
-openModal(`
-<h3>Checkout</h3>
-<label>Name</label>
-<input id="cName">
-<label>Phone</label>
-<input id="cPhone">
-<label>Address</label>
-<input id="cAddress">
-<label>Delivery Area</label>
-<select id="cArea">
-<option value="50">জলঢাকা (50৳)</option>
-<option value="75">নীলফামারী (75৳)</option>
-<option value="120">বাংলাদেশ (120৳)</option>
+html+=`
+<div class="checkout-box">
+<p>Subtotal: ৳${subtotal}</p>
+<select id="area" onchange="updateTotal(${subtotal})">
+<option value="50">জলঢাকা (50)</option>
+<option value="75">নীলফামারী (75)</option>
+<option value="120">বাংলাদেশ (120)</option>
 </select>
-<label>Payment</label>
-<select id="cPay">
-<option>Cash On Delivery</option>
-<option>Bkash</option>
-<option>Nagad</option>
-<option>Rocket</option>
-</select>
-<button onclick="confirmOrder()">Confirm Order</button>
-`);
+<p>Total: ৳<span id="finalTotal">${subtotal+50}</span></p>
+<h4>Checkout</h4>
+<input id="customername" placeholder="Your Name">
+<input id="phone" placeholder="Phone">
+<input id="address" placeholder="Address">
+<button onclick="placeOrder(${subtotal})">Confirm Order</button>
+</div>`;
+document.getElementById("cartPage").innerHTML=html;
 }
 
-function confirmOrder(){
-let total=cart.reduce((sum,p)=>sum+parseInt(p.price),0);
-let delivery=parseInt(document.getElementById("cArea").value);
-let finalTotal=total+delivery;
+function changeQty(id,change){
+let item=cart.find(i=>i.id==id);
+item.qty+=change;
+if(item.qty<=0){cart=cart.filter(i=>i.id!=id)}
+showCart();
+updateCartCount();
+}
 
-let order={
-CustomerName:document.getElementById("cName").value,
-Phone:document.getElementById("cPhone").value,
-Address:document.getElementById("cAddress").value,
-PaymentMethod:document.getElementById("cPay").value,
-ProductList:JSON.stringify(cart),
-Status:"Pending"
-};
+function updateTotal(subtotal){
+let delivery=parseInt(document.getElementById("area").value);
+document.getElementById("finalTotal").innerText=subtotal+delivery;
+}
 
-fetch(sheetURL,{method:"POST",body:JSON.stringify(order)})
+function placeOrder(subtotal){
+let delivery=parseInt(document.getElementById("area").value);
+let total=subtotal+delivery;
+
+let productlist=cart.map(i=>`${i.name} (${i.qty}pcs)`).join(", ");
+
+let formData=new FormData();
+formData.append("customername",document.getElementById("customername").value);
+formData.append("phone",document.getElementById("phone").value);
+formData.append("address",document.getElementById("address").value);
+formData.append("productlist",productlist);
+formData.append("subtotal",subtotal);
+formData.append("delivery",delivery);
+formData.append("total",total);
+
+fetch(scriptURL,{method:"POST",body:formData})
+.then(res=>res.text())
 .then(()=>{
 cart=[];
-document.getElementById("cartCount").innerText=0;
-closeModal();
-showToast("🎉 Order Confirmed! Total ৳ "+finalTotal);
+updateCartCount();
+document.getElementById("cartPage").classList.add("hidden");
+document.getElementById("successBox").style.display="block";
 });
 }
 
-function buyNow(p){cart=[p];checkout()}
-
-function openDetails(p){
-openModal(`
-<h3>${p.name}</h3>
-<img src="${p.image}" style="width:100%">
-<p>${p.description||""}</p>
-<div class="price">৳ ${p.price}</div>
-<button onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
-`);
+function closeSuccess(){
+document.getElementById("successBox").style.display="none";
 }
 
-function openModal(html){
-document.getElementById("modal").style.display="flex";
-document.getElementById("modalContent").innerHTML=html+`<button onclick="closeModal()">Close</button>`;
-}
-
-function closeModal(){document.getElementById("modal").style.display="none"}
-function goHome(){renderProducts(products)}
-
-function showToast(msg){
-let t=document.getElementById("toast");
-t.innerText=msg;
-t.style.display="block";
-setTimeout(()=>{t.style.display="none"},2000);
-}
+document.getElementById("search").addEventListener("input",function(){
+let value=this.value.toLowerCase();
+let filtered=products.filter(p=>normalize(p).name.toLowerCase().includes(value));
+displayProducts(filtered);
+});
 
 </script>
+
 </body>
 </html>
