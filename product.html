@@ -19,8 +19,8 @@ border-radius:6px;font-size:12px;display:inline-block;margin-top:5px;}
 button{width:100%;padding:12px;margin-top:10px;
 border:none;border-radius:8px;font-weight:bold;font-size:16px;}
 .buy{background:#ff6a00;color:white;}
-input{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #ccc;}
-.hidden{display:none;}
+input,select{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #ccc;}
+.summary{background:#fff3e0;padding:10px;border-radius:8px;margin-top:10px;}
 </style>
 </head>
 
@@ -31,12 +31,34 @@ input{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid 
 <div class="container">
 <div class="card" id="productBox"></div>
 
-<div class="card hidden" id="orderBox">
+<div class="card">
 <h3>Order Now</h3>
+
+<select id="quantity" onchange="calculateTotal()">
+<option value="1">1 Piece</option>
+<option value="2">2 Pieces</option>
+<option value="3">3 Pieces</option>
+<option value="4">4 Pieces</option>
+<option value="5">5 Pieces</option>
+</select>
+
+<select id="location" onchange="calculateTotal()">
+<option value="60">Inside Dhaka - ৳60</option>
+<option value="120">Outside Dhaka - ৳120</option>
+</select>
+
+<div class="summary">
+Product Total: ৳<span id="productTotal">0</span><br>
+Delivery: ৳<span id="deliveryCharge">0</span><br>
+<b>Grand Total: ৳<span id="grandTotal">0</span></b>
+</div>
+
 <input id="name" placeholder="Your Name">
 <input id="phone" placeholder="Phone Number">
 <input id="address" placeholder="Address">
+
 <button class="buy" onclick="submitOrder()">Confirm Order</button>
+
 </div>
 </div>
 
@@ -46,6 +68,7 @@ const SHEET_URL = "https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0N
 const ORDER_URL = "https://script.google.com/macros/s/AKfycbwmSjQZKHkql6DmE9pNxO4VmqwnCeDSqrru29ENN-RLUFpAUVjhapHgQei63mt7Gz6H/exec";
 
 let product;
+let basePrice = 0;
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
@@ -54,7 +77,9 @@ fetch(SHEET_URL)
 .then(res=>res.json())
 .then(data=>{
     product = data.find(p => p.id == id);
+    basePrice = Number(product.price);
     showProduct();
+    calculateTotal();
 });
 
 function showProduct(){
@@ -65,12 +90,20 @@ function showProduct(){
         <div class="new">৳${product.price}</div>
         <div class="badge">${product.discount}% OFF</div>
         <p>${product.description}</p>
-        <button class="buy" onclick="buyNow()">Buy Now</button>
     `;
 }
 
-function buyNow(){
-    document.getElementById("orderBox").classList.remove("hidden");
+function calculateTotal(){
+
+    const qty = Number(document.getElementById("quantity").value);
+    const delivery = Number(document.getElementById("location").value);
+
+    const productTotal = basePrice * qty;
+    const grandTotal = productTotal + delivery;
+
+    document.getElementById("productTotal").innerText = productTotal;
+    document.getElementById("deliveryCharge").innerText = delivery;
+    document.getElementById("grandTotal").innerText = grandTotal;
 }
 
 function submitOrder(){
@@ -78,6 +111,9 @@ function submitOrder(){
     const name = document.getElementById("name").value;
     const phone = document.getElementById("phone").value;
     const address = document.getElementById("address").value;
+    const qty = document.getElementById("quantity").value;
+    const locationText = document.getElementById("location").selectedOptions[0].text;
+    const grandTotal = document.getElementById("grandTotal").innerText;
 
     if(!name || !phone || !address){
         alert("Fill all fields");
@@ -89,7 +125,10 @@ function submitOrder(){
         phone: phone,
         address: address,
         paymentmethod: "Cash On Delivery",
-        productlist: product.name + " - ৳" + product.price
+        productlist: product.name + 
+        " | Qty: " + qty + 
+        " | " + locationText + 
+        " | Total: ৳" + grandTotal
     };
 
     fetch(ORDER_URL,{
@@ -99,7 +138,6 @@ function submitOrder(){
     .then(res=>res.text())
     .then(data=>{
         alert("Order Successful!");
-        document.getElementById("orderBox").classList.add("hidden");
     })
     .catch(err=>{
         alert("Order Failed");
