@@ -6,21 +6,25 @@
 <title>Shahin Tech BD</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f1f1;padding-bottom:70px;}
+body{
+margin:0;
+font-family:Arial;
+background:#f1f1f1;
+padding-bottom:70px;
+}
 
 .header{
 background:#0d1b2a;
 color:white;
 padding:12px;
-font-weight:bold;
 display:flex;
 justify-content:space-between;
-align-items:center;
+font-weight:bold;
 }
 
 .search-box{
-padding:10px;
 background:white;
+padding:10px;
 }
 
 .search-box input{
@@ -28,23 +32,25 @@ width:100%;
 padding:10px;
 border-radius:8px;
 border:1px solid #ccc;
+font-size:15px;
 }
 
 .categories{
 display:flex;
 overflow:auto;
-background:#fff;
+gap:8px;
 padding:10px;
-gap:10px;
+background:white;
 }
 
 .categories button{
 background:#0d1b2a;
 color:white;
 border:none;
-padding:8px 12px;
+padding:7px 12px;
 border-radius:20px;
 white-space:nowrap;
+font-size:13px;
 }
 
 .container{
@@ -66,11 +72,29 @@ width:100%;
 border-radius:8px;
 }
 
-.old{color:gray;text-decoration:line-through;font-size:13px;}
-.price{color:#ff6a00;font-weight:bold;font-size:16px;}
-.badge{background:red;color:white;font-size:11px;padding:3px 6px;border-radius:5px;display:inline-block;margin-top:4px;}
+.old{
+color:gray;
+text-decoration:line-through;
+font-size:13px;
+}
 
-button.buy{
+.price{
+color:#ff6a00;
+font-weight:bold;
+font-size:16px;
+}
+
+.badge{
+background:red;
+color:white;
+font-size:11px;
+padding:3px 6px;
+border-radius:5px;
+display:inline-block;
+margin-top:4px;
+}
+
+.buy{
 width:100%;
 padding:8px;
 margin-top:8px;
@@ -98,7 +122,6 @@ text-decoration:none;
 font-size:13px;
 text-align:center;
 }
-
 </style>
 </head>
 
@@ -110,16 +133,10 @@ text-align:center;
 </div>
 
 <div class="search-box">
-<input type="text" id="searchInput" placeholder="Search product..." onkeyup="filterProducts()">
+<input type="text" id="searchInput" placeholder="Search product..." onkeyup="searchProduct()">
 </div>
 
-<div class="categories">
-<button onclick="filterCategory('all')">All</button>
-<button onclick="filterCategory('Accessories')">Accessories</button>
-<button onclick="filterCategory('Gaming')">Gaming</button>
-<button onclick="filterCategory('Power')">Power</button>
-<button onclick="filterCategory('Gadgets')">Gadgets</button>
-</div>
+<div class="categories" id="categoryButtons"></div>
 
 <div class="container" id="productList"></div>
 
@@ -133,6 +150,7 @@ text-align:center;
 <script>
 
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
+
 let allProducts=[];
 
 fetch(SHEET_URL)
@@ -140,6 +158,7 @@ fetch(SHEET_URL)
 .then(data=>{
 allProducts=data;
 displayProducts(data);
+createCategoryButtons(data);
 });
 
 function displayProducts(data){
@@ -161,10 +180,17 @@ container.innerHTML+=`
 });
 }
 
-function filterProducts(){
-const search=document.getElementById("searchInput").value.toLowerCase();
-const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(search));
-displayProducts(filtered);
+function createCategoryButtons(data){
+const catContainer=document.getElementById("categoryButtons");
+let categories=[...new Set(data.map(p=>p.category.toLowerCase()))];
+
+catContainer.innerHTML=`<button onclick="filterCategory('all')">All</button>`;
+
+categories.forEach(cat=>{
+catContainer.innerHTML+=`
+<button onclick="filterCategory('${cat}')">${cat}</button>
+`;
+});
 }
 
 function filterCategory(cat){
@@ -172,7 +198,13 @@ if(cat=="all"){
 displayProducts(allProducts);
 return;
 }
-const filtered=allProducts.filter(p=>p.category==cat);
+const filtered=allProducts.filter(p=>p.category.toLowerCase()==cat);
+displayProducts(filtered);
+}
+
+function searchProduct(){
+const value=document.getElementById("searchInput").value.toLowerCase();
+const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
 displayProducts(filtered);
 }
 
