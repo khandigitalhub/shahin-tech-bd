@@ -3,174 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Details</title>
+<title>Product - Shahin Tech BD</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f1f1f1;}
-.header{background:#0d1b2a;color:white;padding:15px;}
-.container{padding:15px;}
-.card{background:white;padding:15px;border-radius:10px;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-bottom:15px;}
-img{width:100%;border-radius:10px;}
-.old{color:gray;text-decoration:line-through;}
-.new{color:#ff6a00;font-size:22px;font-weight:bold;}
-.badge{background:red;color:white;padding:4px 8px;
-border-radius:6px;font-size:12px;display:inline-block;margin-top:5px;}
-input,select{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #ccc;}
-button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;font-weight:bold;font-size:16px;background:#ff6a00;color:white;}
-.summary{background:#fff3e0;padding:10px;border-radius:8px;margin-top:10px;}
-
-.voucher{
-max-width:400px;
-margin:60px auto;
-background:white;
-padding:25px;
-border-radius:15px;
-text-align:center;
-box-shadow:0 0 25px rgba(0,0,0,0.3);
-animation:fade 0.4s ease-in-out;
+body{
+margin:0;
+font-family:Arial;
+background:#f4f4f4;
+padding-bottom:280px;
 }
-@keyframes fade{
-from{opacity:0;transform:scale(0.9);}
-to{opacity:1;transform:scale(1);}
+
+/* PRODUCT AREA */
+.product-box{
+background:white;
+padding:15px;
+}
+
+.product-box img{
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.product-box h2{
+margin:10px 0 5px;
+}
+
+.price{
+color:#ff512f;
+font-size:20px;
+font-weight:bold;
+}
+
+.old{
+text-decoration:line-through;
+color:gray;
+font-size:14px;
+}
+
+/* ORDER BOX */
+.order-box{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:white;
+padding:15px;
+box-shadow:0 -3px 10px rgba(0,0,0,0.2);
+border-top-left-radius:15px;
+border-top-right-radius:15px;
+}
+
+/* QTY */
+.qty{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:10px;
+margin:10px 0;
+}
+
+.qty button{
+padding:5px 12px;
+font-size:18px;
+border:none;
+background:#ff512f;
+color:white;
+border-radius:5px;
+}
+
+.qty span{
+font-size:18px;
+font-weight:bold;
+}
+
+/* INPUT */
+input, select{
+width:100%;
+padding:8px;
+margin:5px 0;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.total{
+background:#fff3e0;
+padding:8px;
+border-radius:6px;
+margin-top:5px;
+font-size:14px;
+}
+
+.order-btn{
+width:100%;
+padding:10px;
+margin-top:8px;
+background:#ff512f;
+color:white;
+border:none;
+border-radius:6px;
+font-size:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">Shahin Tech BD</div>
+<div class="product-box" id="productDetails"></div>
 
-<div class="container" id="mainContent">
-
-<div class="card" id="productBox"></div>
-
-<div class="card">
-<h3>Order Now</h3>
-
-<select id="quantity" onchange="calculateTotal()">
-<option value="1">1 Piece</option>
-<option value="2">2 Pieces</option>
-<option value="3">3 Pieces</option>
-<option value="4">4 Pieces</option>
-<option value="5">5 Pieces</option>
-</select>
-
-<select id="location" onchange="calculateTotal()">
-<option value="50">Jaldhaka Upazila - ৳50</option>
-<option value="100">Nilphamari District - ৳100</option>
-<option value="150">Outside Nilphamari (Bangladesh) - ৳150</option>
-</select>
-
-<div class="summary">
-Product Total: ৳<span id="productTotal">0</span><br>
-Delivery: ৳<span id="deliveryCharge">0</span><br>
-<b>Grand Total: ৳<span id="grandTotal">0</span></b>
+<div class="order-box">
+<div class="qty">
+<button onclick="decrease()">-</button>
+<span id="quantity">1</span>
+<button onclick="increase()">+</button>
 </div>
 
-<input id="name" placeholder="Your Name">
-<input id="phone" placeholder="Phone Number">
-<input id="address" placeholder="Address">
+<select id="delivery" onchange="updateTotal()">
+<option value="50">Jaldhaka - ৳50</option>
+<option value="100">Outside District - ৳100</option>
+</select>
 
-<button onclick="submitOrder()">Confirm Order</button>
+<div class="total" id="totalBox"></div>
 
-</div>
+<button class="order-btn" onclick="placeOrder()">Place Order</button>
 </div>
 
 <script>
-
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
-const ORDER_URL="https://script.google.com/macros/s/AKfycbwmSjQZKHkql6DmE9pNxO4VmqwnCeDSqrru29ENN-RLUFpAUVjhapHgQei63mt7Gz6H/exec";
+const ORDER_SCRIPT_URL="PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
 
-let product;
-let basePrice=0;
+let productData;
+let quantity=1;
+let deliveryCharge=50;
 
 const params=new URLSearchParams(window.location.search);
-const id=params.get("id");
+const productId=params.get("id");
 
 fetch(SHEET_URL)
 .then(res=>res.json())
 .then(data=>{
-product=data.find(p=>p.id==id);
-basePrice=Number(product.price);
+productData=data.find(p=>p.id==productId);
 showProduct();
-calculateTotal();
+updateTotal();
 });
 
 function showProduct(){
-document.getElementById("productBox").innerHTML=`
-<img src="${product.image}">
-<h2>${product.name}</h2>
-<div class="old">৳${product.oldprice}</div>
-<div class="new">৳${product.price}</div>
-<div class="badge">${product.discount}% OFF</div>
-<p>${product.description}</p>
+document.getElementById("productDetails").innerHTML=`
+<img src="${productData.image}" onerror="this.src='https://via.placeholder.com/300x200'">
+<h2>${productData.name}</h2>
+<div class="old">৳${productData.oldprice}</div>
+<div class="price">৳${productData.price}</div>
+<p>${productData.description}</p>
 `;
 }
 
-function calculateTotal(){
-const qty=Number(document.getElementById("quantity").value);
-const delivery=Number(document.getElementById("location").value);
-const productTotal=basePrice*qty;
-const grandTotal=productTotal+delivery;
-document.getElementById("productTotal").innerText=productTotal;
-document.getElementById("deliveryCharge").innerText=delivery;
-document.getElementById("grandTotal").innerText=grandTotal;
+function increase(){
+quantity++;
+document.getElementById("quantity").innerText=quantity;
+updateTotal();
 }
 
-function submitOrder(){
+function decrease(){
+if(quantity>1){
+quantity--;
+document.getElementById("quantity").innerText=quantity;
+updateTotal();
+}
+}
 
-const name=document.getElementById("name").value;
-const phone=document.getElementById("phone").value;
-const address=document.getElementById("address").value;
-const qty=document.getElementById("quantity").value;
-const locationText=document.getElementById("location").selectedOptions[0].text;
-const total=document.getElementById("grandTotal").innerText;
+function updateTotal(){
+deliveryCharge=parseInt(document.getElementById("delivery").value);
+let total=(productData.price*quantity)+deliveryCharge;
 
-if(!name||!phone||!address){
-alert("Fill all fields");
+document.getElementById("totalBox").innerHTML=
+`Product: ৳${productData.price*quantity}<br>
+Delivery: ৳${deliveryCharge}<br>
+<b>Grand Total: ৳${total}</b>`;
+}
+
+function placeOrder(){
+
+let user=JSON.parse(localStorage.getItem("userData"));
+
+if(!user){
+alert("দয়া করে আগে Account এ তথ্য সেভ করুন");
+window.location.href="account.html";
 return;
 }
 
-const orderNumber="STB"+Math.floor(Math.random()*100000);
-
-const orderData={
-customername:name,
-phone:phone,
-address:address,
-paymentmethod:"Cash On Delivery",
-productlist:product.name+" | Qty:"+qty+" | "+locationText+" | Total:৳"+total+" | Order:"+orderNumber
+let orderData={
+product:productData.name,
+price:productData.price,
+quantity:quantity,
+delivery:deliveryCharge,
+total:(productData.price*quantity)+deliveryCharge,
+customer:user.name,
+phone:user.phone,
+address:user.address+", "+user.upazila+", "+user.district
 };
 
-fetch(ORDER_URL,{
+fetch(ORDER_SCRIPT_URL,{
 method:"POST",
 body:JSON.stringify(orderData)
 })
 .then(res=>res.text())
 .then(data=>{
-
-document.body.innerHTML=`
-<div class="voucher">
-<h2>🎉 Order Confirmed!</h2>
-<p><b>Order No:</b> ${orderNumber}</p>
-<p><b>Name:</b> ${name}</p>
-<p><b>Product:</b> ${product.name}</p>
-<p><b>Quantity:</b> ${qty}</p>
-<p><b>Total:</b> ৳${total}</p>
-<hr>
-<p>Thank you for shopping with Shahin Tech BD ❤️</p>
-<p>Redirecting to Home...</p>
-</div>
-`;
-
-setTimeout(()=>{
+alert("Order সফল হয়েছে ✅");
 window.location.href="index.html";
-},3000);
-
 });
-
 }
-
 </script>
 
 </body>
