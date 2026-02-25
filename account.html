@@ -6,69 +6,142 @@
 <title>My Account</title>
 
 <style>
-body{font-family:Arial;background:#f2f2f2;padding:10px;}
-.box{background:#fff;padding:15px;border-radius:12px;}
-input,textarea{
-width:100%;
-padding:8px;
-margin-bottom:10px;
-border-radius:6px;
-border:1px solid #ccc;
+body{
+font-family:Arial;
+background:#f2f2f2;
+padding:15px;
+padding-bottom:80px;
 }
+
+.container{
+background:#fff;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+label{
+font-weight:bold;
+font-size:14px;
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin:6px 0 15px 0;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:14px;
+}
+
+small{
+color:#777;
+font-size:12px;
+}
+
 button{
 background:#00c853;
-color:#fff;
-padding:10px;
+color:white;
+padding:12px;
 border:none;
 width:100%;
-border-radius:8px;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#009624;
+}
+
+.success{
+color:green;
+text-align:center;
+margin-top:10px;
+font-weight:bold;
 }
 </style>
 </head>
+
 <body>
 
-<h2>My Account</h2>
+<div class="container">
+<h2>👤 My Account</h2>
 
-<div class="box">
 <form id="accountForm">
-<input type="text" id="name" placeholder="নাম" required>
-<input type="text" id="phone" placeholder="মোবাইল নম্বর" required>
-<input type="text" id="whatsapp" placeholder="হোয়াটসঅ্যাপ নম্বর">
-<input type="text" id="altphone" placeholder="বিকল্প নম্বর">
-<input type="number" id="age" placeholder="বয়স">
-<textarea id="address" placeholder="সম্পূর্ণ ঠিকানা" required></textarea>
+
+<label>নাম</label>
+<input type="text" id="name" required>
+
+<label>মোবাইল নম্বর</label>
+<input type="text" id="phone" required>
+
+<label>WhatsApp নম্বর</label>
+<small>(যদি থাকে)</small>
+<input type="text" id="whatsapp">
+
+<label>বিকল্প মোবাইল নম্বর</label>
+<small>(যদি থাকে)</small>
+<input type="text" id="altphone">
+
+<label>সম্পূর্ণ ঠিকানা</label>
+<textarea id="address" required></textarea>
+
+<label>উপজেলা</label>
+<input type="text" id="upazila" required>
+
+<label>জেলা</label>
+<input type="text" id="district" required>
 
 <button type="submit">Save Information</button>
+
+<div class="success" id="successMsg"></div>
+
 </form>
 </div>
 
 <script>
-let saved=JSON.parse(localStorage.getItem("user"));
+
+// পুরোনো ডাটা থাকলে দেখাবে
+let saved = JSON.parse(localStorage.getItem("user"));
 if(saved){
-name.value=saved.name;
-phone.value=saved.phone;
-whatsapp.value=saved.whatsapp;
-altphone.value=saved.altphone;
-age.value=saved.age;
-address.value=saved.address;
+document.getElementById("name").value = saved.name || "";
+document.getElementById("phone").value = saved.phone || "";
+document.getElementById("whatsapp").value = saved.whatsapp || "";
+document.getElementById("altphone").value = saved.altphone || "";
+document.getElementById("address").value = saved.address || "";
+document.getElementById("upazila").value = saved.upazila || "";
+document.getElementById("district").value = saved.district || "";
 }
 
 document.getElementById("accountForm").onsubmit=function(e){
 e.preventDefault();
 
-let user={
-name:name.value,
-phone:phone.value,
-whatsapp:whatsapp.value,
-altphone:altphone.value,
-age:age.value,
-address:address.value
+let userData={
+name:document.getElementById("name").value,
+phone:document.getElementById("phone").value,
+whatsapp:document.getElementById("whatsapp").value,
+altphone:document.getElementById("altphone").value,
+address:document.getElementById("address").value,
+upazila:document.getElementById("upazila").value,
+district:document.getElementById("district").value
 };
 
-localStorage.setItem("user",JSON.stringify(user));
-alert("Saved Successfully");
-window.location="checkout.html";
-}
+localStorage.setItem("user",JSON.stringify(userData));
+
+document.getElementById("successMsg").innerText="✅ তথ্য সফলভাবে সংরক্ষণ হয়েছে";
+
+setTimeout(()=>{
+document.getElementById("successMsg").innerText="";
+},3000);
+
+};
+
 </script>
 
 </body>
