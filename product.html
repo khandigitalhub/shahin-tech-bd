@@ -19,6 +19,21 @@ border-radius:6px;font-size:12px;display:inline-block;margin-top:5px;}
 input,select{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #ccc;}
 button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;font-weight:bold;font-size:16px;background:#ff6a00;color:white;}
 .summary{background:#fff3e0;padding:10px;border-radius:8px;margin-top:10px;}
+
+.voucher{
+max-width:400px;
+margin:60px auto;
+background:white;
+padding:25px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 0 25px rgba(0,0,0,0.3);
+animation:fade 0.4s ease-in-out;
+}
+@keyframes fade{
+from{opacity:0;transform:scale(0.9);}
+to{opacity:1;transform:scale(1);}
+}
 </style>
 </head>
 
@@ -26,7 +41,7 @@ button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;fon
 
 <div class="header">Shahin Tech BD</div>
 
-<div class="container">
+<div class="container" id="mainContent">
 
 <div class="card" id="productBox"></div>
 
@@ -117,12 +132,14 @@ alert("Fill all fields");
 return;
 }
 
+const orderNumber="STB"+Math.floor(Math.random()*100000);
+
 const orderData={
 customername:name,
 phone:phone,
 address:address,
 paymentmethod:"Cash On Delivery",
-productlist:product.name+" | Qty:"+qty+" | "+locationText+" | Total:৳"+total
+productlist:product.name+" | Qty:"+qty+" | "+locationText+" | Total:৳"+total+" | Order:"+orderNumber
 };
 
 fetch(ORDER_URL,{
@@ -131,8 +148,27 @@ body:JSON.stringify(orderData)
 })
 .then(res=>res.text())
 .then(data=>{
-alert("Order Successful!");
+
+document.body.innerHTML=`
+<div class="voucher">
+<h2>🎉 Order Confirmed!</h2>
+<p><b>Order No:</b> ${orderNumber}</p>
+<p><b>Name:</b> ${name}</p>
+<p><b>Product:</b> ${product.name}</p>
+<p><b>Quantity:</b> ${qty}</p>
+<p><b>Total:</b> ৳${total}</p>
+<hr>
+<p>Thank you for shopping with Shahin Tech BD ❤️</p>
+<p>Redirecting to Home...</p>
+</div>
+`;
+
+setTimeout(()=>{
+window.location.href="index.html";
+},3000);
+
 });
+
 }
 
 </script>
