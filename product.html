@@ -10,7 +10,7 @@ body{
 margin:0;
 font-family:Arial;
 background:#f4f4f4;
-padding-bottom:280px;
+padding-bottom:120px;
 }
 
 .product-box{
@@ -20,7 +20,7 @@ padding:15px;
 
 .product-box img{
 width:100%;
-height:230px;
+height:220px;
 object-fit:cover;
 border-radius:12px;
 }
@@ -41,24 +41,12 @@ color:gray;
 font-size:14px;
 }
 
-.order-box{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:white;
-padding:15px;
-box-shadow:0 -3px 10px rgba(0,0,0,0.2);
-border-top-left-radius:20px;
-border-top-right-radius:20px;
-}
-
 .qty{
 display:flex;
 justify-content:center;
 align-items:center;
 gap:15px;
-margin:10px 0;
+margin:15px 0;
 }
 
 .qty button{
@@ -75,31 +63,34 @@ font-size:20px;
 font-weight:bold;
 }
 
-select{
-width:100%;
-padding:8px;
-margin:6px 0;
-border-radius:6px;
-border:1px solid #ccc;
-}
-
-.total{
-background:#fff3e0;
-padding:8px;
-border-radius:6px;
-margin-top:6px;
-font-size:14px;
-}
-
-.order-btn{
-width:100%;
+.bottom-bar{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:white;
 padding:10px;
-margin-top:8px;
+display:flex;
+gap:10px;
+box-shadow:0 -3px 10px rgba(0,0,0,0.2);
+}
+
+.cart-btn{
+flex:1;
+background:#222;
+color:white;
+border:none;
+padding:12px;
+border-radius:6px;
+}
+
+.buy-btn{
+flex:1;
 background:#ff512f;
 color:white;
 border:none;
+padding:12px;
 border-radius:6px;
-font-size:16px;
 }
 </style>
 </head>
@@ -108,34 +99,23 @@ font-size:16px;
 
 <div class="product-box" id="productDetails"></div>
 
-<div class="order-box">
-
 <div class="qty">
 <button onclick="decrease()">-</button>
 <span id="quantity">1</span>
 <button onclick="increase()">+</button>
 </div>
 
-<select id="delivery" onchange="updateTotal()">
-<option value="50">Jaldhaka - ৳50</option>
-<option value="100">Outside District - ৳100</option>
-</select>
-
-<div class="total" id="totalBox"></div>
-
-<button class="order-btn" onclick="placeOrder()">Place Order</button>
-
+<div class="bottom-bar">
+<button class="cart-btn" onclick="addToCart()">Add to Cart</button>
+<button class="buy-btn" onclick="buyNow()">Buy Now</button>
 </div>
 
 <script>
 
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
 
-const ORDER_SCRIPT_URL="https://script.google.com/macros/s/AKfycbxeUxtZOpRcyorV-cnbHyr82lgTUxTem6yn29d80qgKmrmWjqbV84NP6lhDkwcAWsWG/exec";
-
 let productData;
 let quantity=1;
-let deliveryCharge=50;
 
 const params=new URLSearchParams(window.location.search);
 const productId=params.get("id");
@@ -145,7 +125,6 @@ fetch(SHEET_URL)
 .then(data=>{
 productData=data.find(p=>p.id==productId);
 showProduct();
-updateTotal();
 });
 
 function showProduct(){
@@ -161,57 +140,41 @@ document.getElementById("productDetails").innerHTML=`
 function increase(){
 quantity++;
 document.getElementById("quantity").innerText=quantity;
-updateTotal();
 }
 
 function decrease(){
 if(quantity>1){
 quantity--;
 document.getElementById("quantity").innerText=quantity;
-updateTotal();
 }
 }
 
-function updateTotal(){
-deliveryCharge=parseInt(document.getElementById("delivery").value);
-let total=(parseFloat(productData.price)*quantity)+deliveryCharge;
+function addToCart(){
 
-document.getElementById("totalBox").innerHTML=
-`Product: ৳${productData.price*quantity}<br>
-Delivery: ৳${deliveryCharge}<br>
-<b>Grand Total: ৳${total}</b>`;
-}
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
 
-function placeOrder(){
+let existing=cart.find(item=>item.id==productData.id);
 
-let user=JSON.parse(localStorage.getItem("userData"));
-
-if(!user){
-alert("দয়া করে আগে Account এ তথ্য সেভ করুন");
-window.location.href="account.html";
-return;
-}
-
-let orderData={
-product:productData.name,
+if(existing){
+existing.quantity+=quantity;
+}else{
+cart.push({
+id:productData.id,
+name:productData.name,
 price:productData.price,
-quantity:quantity,
-delivery:deliveryCharge,
-total:(productData.price*quantity)+deliveryCharge,
-customer:user.name,
-phone:user.phone,
-address:user.address+", "+user.upazila+", "+user.district
-};
-
-fetch(ORDER_SCRIPT_URL,{
-method:"POST",
-body:JSON.stringify(orderData)
-})
-.then(res=>res.text())
-.then(data=>{
-alert("Order সফল হয়েছে ✅");
-window.location.href="index.html";
+image:productData.image,
+quantity:quantity
 });
+}
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+alert("Added to Cart ✅");
+}
+
+function buyNow(){
+addToCart();
+window.location.href="cart.html";
 }
 
 </script>
