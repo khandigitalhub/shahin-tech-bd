@@ -3,114 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>মাই একাউন্ট - Shahin Tech BD</title>
+<title>মাই একাউন্ট</title>
 
 <style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:white;
+body{margin:0;font-family:Arial;background:#f1f1f1;padding-bottom:70px;}
+.container{max-width:400px;margin:30px auto;background:white;padding:20px;border-radius:12px;box-shadow:0 3px 12px rgba(0,0,0,0.1);}
+input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #ccc;}
+button{width:100%;padding:10px;border:none;border-radius:6px;background:#ff6a00;color:white;font-weight:bold;margin-top:8px;}
+.logout{background:red;}
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#0d1b2a;
+display:flex;
+justify-content:space-around;
+padding:8px 0;
 }
 
-.container{
-    max-width:400px;
-    margin:40px auto;
-    background:white;
-    color:black;
-    padding:20px;
-    border-radius:15px;
-    box-shadow:0 0 20px rgba(0,0,0,0.4);
-}
-
-h2{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-input{
-    width:100%;
-    padding:12px;
-    margin:8px 0;
-    border-radius:8px;
-    border:1px solid #ccc;
-    font-size:16px;
-}
-
-button{
-    width:100%;
-    padding:12px;
-    background:#ff6600;
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    margin-top:10px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#e65c00;
-}
-
-.logout{
-    background:red;
+.bottom-nav a{
+color:white;
+text-decoration:none;
+font-size:13px;
+text-align:center;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container" id="accountBox">
-    <h2>মাই একাউন্ট</h2>
+<h2>মাই একাউন্ট</h2>
+<input type="text" id="name" placeholder="আপনার নাম">
+<input type="text" id="phone" placeholder="মোবাইল নাম্বার">
+<input type="text" id="address" placeholder="আপনার ঠিকানা">
+<button onclick="saveAccount()">সেভ করুন</button>
+</div>
 
-    <input type="text" id="name" placeholder="আপনার নাম">
-    <input type="text" id="phone" placeholder="মোবাইল নাম্বার">
-    <input type="text" id="address" placeholder="আপনার ঠিকানা">
-
-    <button onclick="saveAccount()">সেভ করুন</button>
+<div class="bottom-nav">
+<a href="index.html">🏠<br>Home</a>
+<a href="#">📂<br>Category</a>
+<a href="#">🛒<br>Orders</a>
+<a href="account.html">👤<br>Account</a>
 </div>
 
 <script>
 
-window.onload = function(){
-    const user = JSON.parse(localStorage.getItem("userData"));
-
-    if(user){
-        document.getElementById("accountBox").innerHTML = `
-            <h2>স্বাগতম, ${user.name}</h2>
-            <p><b>মোবাইল:</b> ${user.phone}</p>
-            <p><b>ঠিকানা:</b> ${user.address}</p>
-            <button onclick="logout()" class="logout">লগআউট</button>
-        `;
-    }
+window.onload=function(){
+const user=JSON.parse(localStorage.getItem("userData"));
+if(user){
+document.getElementById("accountBox").innerHTML=`
+<h2>স্বাগতম, ${user.name}</h2>
+<p><b>মোবাইল:</b> ${user.phone}</p>
+<p><b>ঠিকানা:</b> ${user.address}</p>
+<button onclick="logout()" class="logout">লগআউট</button>
+`;
+}
 }
 
 function saveAccount(){
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const address = document.getElementById("address").value;
+const name=document.getElementById("name").value;
+const phone=document.getElementById("phone").value;
+const address=document.getElementById("address").value;
 
-    if(name=="" || phone=="" || address==""){
-        alert("সব তথ্য পূরণ করুন");
-        return;
-    }
+if(!name||!phone||!address){
+alert("সব তথ্য পূরণ করুন");
+return;
+}
 
-    const userData = {
-        name:name,
-        phone:phone,
-        address:address
-    };
-
-    localStorage.setItem("userData", JSON.stringify(userData));
-
-    alert("তথ্য সেভ হয়েছে ✅");
-    location.reload();
+localStorage.setItem("userData",JSON.stringify({name,phone,address}));
+alert("সেভ হয়েছে ✅");
+location.reload();
 }
 
 function logout(){
-    localStorage.removeItem("userData");
-    alert("লগআউট হয়েছে");
-    location.reload();
+localStorage.removeItem("userData");
+location.reload();
 }
 
 </script>
