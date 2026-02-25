@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart - Shahin Tech BD</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#f4f4f4;
+padding-bottom:100px;
+}
+
+.header{
+background:#111;
+color:white;
+padding:15px;
+text-align:center;
+font-size:18px;
+}
+
+.cart-item{
+background:white;
+margin:10px;
+padding:10px;
+border-radius:10px;
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.cart-item img{
+width:80px;
+height:80px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.item-info{
+flex:1;
+}
+
+.price{
+color:#ff512f;
+font-weight:bold;
+}
+
+.qty{
+display:flex;
+align-items:center;
+gap:10px;
+margin-top:5px;
+}
+
+.qty button{
+padding:3px 10px;
+border:none;
+background:#ff512f;
+color:white;
+border-radius:4px;
+}
+
+.remove{
+color:red;
+font-size:12px;
+margin-top:5px;
+cursor:pointer;
+}
+
+.total-box{
+background:white;
+margin:10px;
+padding:15px;
+border-radius:10px;
+font-size:16px;
+}
+
+.checkout-btn{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#ff512f;
+color:white;
+border:none;
+padding:15px;
+font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Your Cart</div>
+
+<div id="cartContainer"></div>
+
+<div class="total-box" id="totalBox"></div>
+
+<button class="checkout-btn" onclick="goCheckout()">Proceed to Checkout</button>
+
+<script>
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+function renderCart(){
+
+let container=document.getElementById("cartContainer");
+container.innerHTML="";
+
+let total=0;
+
+cart.forEach((item,index)=>{
+
+total+=item.price*item.quantity;
+
+container.innerHTML+=`
+<div class="cart-item">
+<img src="${item.image}" onerror="this.src='https://via.placeholder.com/100'">
+<div class="item-info">
+<div>${item.name}</div>
+<div class="price">৳${item.price}</div>
+
+<div class="qty">
+<button onclick="decrease(${index})">-</button>
+<span>${item.quantity}</span>
+<button onclick="increase(${index})">+</button>
+</div>
+
+<div class="remove" onclick="removeItem(${index})">Remove</div>
+
+</div>
+</div>
+`;
+});
+
+document.getElementById("totalBox").innerHTML=
+"<b>Subtotal: ৳"+total+"</b>";
+
+if(cart.length==0){
+container.innerHTML="<p style='text-align:center'>Cart is Empty</p>";
+document.getElementById("totalBox").innerHTML="";
+}
+
+}
+
+function increase(index){
+cart[index].quantity++;
+localStorage.setItem("cart",JSON.stringify(cart));
+renderCart();
+}
+
+function decrease(index){
+if(cart[index].quantity>1){
+cart[index].quantity--;
+localStorage.setItem("cart",JSON.stringify(cart));
+renderCart();
+}
+}
+
+function removeItem(index){
+cart.splice(index,1);
+localStorage.setItem("cart",JSON.stringify(cart));
+renderCart();
+}
+
+function goCheckout(){
+if(cart.length==0){
+alert("Cart is empty");
+return;
+}
+window.location.href="checkout.html";
+}
+
+renderCart();
+
+</script>
+
+</body>
+</html>
