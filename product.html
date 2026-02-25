@@ -2,54 +2,86 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>Product Details</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product</title>
 
 <style>
-body{font-family:Arial;background:#f2f2f2;padding:10px;}
-.card{
-background:#fff;
-padding:15px;
-border-radius:12px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+body{
+    font-family: Arial;
+    padding:20px;
 }
-img{width:100%;border-radius:10px;}
-button{
-background:#000;
-color:#fff;
-padding:10px;
-border:none;
-width:100%;
-border-radius:8px;
-margin-top:10px;
+.product-box{
+    max-width:400px;
+    margin:auto;
+}
+.product-box img{
+    width:100%;
+}
+.price{
+    color:red;
+    font-size:22px;
+}
+.oldprice{
+    text-decoration: line-through;
+    color:gray;
+}
+.buy-btn{
+    background:green;
+    color:white;
+    padding:10px;
+    display:inline-block;
+    margin-top:15px;
+    text-decoration:none;
 }
 </style>
 </head>
+
 <body>
 
-<div class="card" id="productBox"></div>
+<div class="product-box">
+    <img id="pimage">
+    <h2 id="pname"></h2>
+    <p class="oldprice" id="poldprice"></p>
+    <p class="price" id="pprice"></p>
+    <p id="pdesc"></p>
+
+    <a href="checkout.html" class="buy-btn">Order Now</a>
+</div>
 
 <script>
-let product=JSON.parse(localStorage.getItem("singleProduct"));
 
-if(!product){
-document.getElementById("productBox").innerHTML="<p>No Product Selected</p>";
-}else{
-document.getElementById("productBox").innerHTML=`
-<img src="${product.image}">
-<h3>${product.name}</h3>
-<p>৳${product.newprice}</p>
-<p style="text-decoration:line-through;color:gray;">৳${product.oldprice}</p>
-<button onclick="addToCart()">Add to Cart</button>
-`;
+// 🔴 এখানে তোমার Apps Script URL বসাও
+const apiURL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+
+const urlParams = new URLSearchParams(window.location.search);
+const productId = urlParams.get("id");
+
+if(!productId){
+    document.body.innerHTML = "<h2>No Product Selected</h2>";
 }
 
-function addToCart(){
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-cart.push(product);
-localStorage.setItem("cart",JSON.stringify(cart));
-alert("Added to Cart");
-}
+fetch(apiURL)
+.then(res => res.json())
+.then(data => {
+
+    const product = data.find(p => p.id == productId);
+
+    if(!product){
+        document.body.innerHTML = "<h2>Product Not Found</h2>";
+        return;
+    }
+
+    document.getElementById("pname").innerText = product.name;
+    document.getElementById("pimage").src = product.image;
+    document.getElementById("pprice").innerText = "৳ " + product.price;
+    document.getElementById("poldprice").innerText = "৳ " + product.oldprice;
+    document.getElementById("pdesc").innerText = product.description;
+
+})
+.catch(error => {
+    document.body.innerHTML = "<h2>Data Load Error</h2>";
+});
+
 </script>
 
 </body>
