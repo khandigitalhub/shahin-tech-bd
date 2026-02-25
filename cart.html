@@ -3,179 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart - Shahin Tech BD</title>
-
+<title>Cart</title>
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#f4f4f4;
-padding-bottom:100px;
-}
-
-.header{
-background:#111;
-color:white;
-padding:15px;
-text-align:center;
-font-size:18px;
-}
-
-.cart-item{
-background:white;
-margin:10px;
-padding:10px;
-border-radius:10px;
-display:flex;
-gap:10px;
-align-items:center;
-}
-
-.cart-item img{
-width:80px;
-height:80px;
-object-fit:cover;
-border-radius:8px;
-}
-
-.item-info{
-flex:1;
-}
-
-.price{
-color:#ff512f;
-font-weight:bold;
-}
-
-.qty{
-display:flex;
-align-items:center;
-gap:10px;
-margin-top:5px;
-}
-
-.qty button{
-padding:3px 10px;
-border:none;
-background:#ff512f;
-color:white;
-border-radius:4px;
-}
-
-.remove{
-color:red;
-font-size:12px;
-margin-top:5px;
-cursor:pointer;
-}
-
-.total-box{
-background:white;
-margin:10px;
-padding:15px;
-border-radius:10px;
-font-size:16px;
-}
-
-.checkout-btn{
+body{font-family:Arial;background:#f2f2f2;padding:10px;padding-bottom:70px;}
+.card{background:#fff;padding:10px;margin-bottom:10px;border-radius:10px;}
+button{background:#000;color:#fff;padding:8px;border:none;width:100%;border-radius:6px;}
+.bottom-nav{
 position:fixed;
 bottom:0;
 left:0;
-right:0;
-background:#ff512f;
-color:white;
-border:none;
-padding:15px;
-font-size:16px;
+width:100%;
+background:#fff;
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+box-shadow:0 -2px 10px rgba(0,0,0,0.1);
 }
+.bottom-nav a{text-decoration:none;color:#000;}
 </style>
 </head>
-
 <body>
 
-<div class="header">Your Cart</div>
+<h2>My Cart</h2>
+<div id="cartItems"></div>
 
-<div id="cartContainer"></div>
+<button onclick="goCheckout()">Proceed to Checkout</button>
 
-<div class="total-box" id="totalBox"></div>
-
-<button class="checkout-btn" onclick="goCheckout()">Proceed to Checkout</button>
+<div class="bottom-nav">
+<a href="index.html">Home</a>
+<a href="cart.html">Cart</a>
+<a href="orders.html">Orders</a>
+<a href="account.html">My Account</a>
+</div>
 
 <script>
-
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let div=document.getElementById("cartItems");
 
-function renderCart(){
-
-let container=document.getElementById("cartContainer");
-container.innerHTML="";
-
-let total=0;
-
-cart.forEach((item,index)=>{
-
-total+=item.price*item.quantity;
-
-container.innerHTML+=`
-<div class="cart-item">
-<img src="${item.image}" onerror="this.src='https://via.placeholder.com/100'">
-<div class="item-info">
+cart.forEach((item,i)=>{
+div.innerHTML+=`
+<div class="card">
+<img src="${item.image}" width="70">
 <div>${item.name}</div>
-<div class="price">৳${item.price}</div>
-
-<div class="qty">
-<button onclick="decrease(${index})">-</button>
-<span>${item.quantity}</span>
-<button onclick="increase(${index})">+</button>
-</div>
-
-<div class="remove" onclick="removeItem(${index})">Remove</div>
-
-</div>
-</div>
-`;
+<div>৳${item.newprice}</div>
+<button onclick="removeItem(${i})">Remove</button>
+</div>`;
 });
 
-document.getElementById("totalBox").innerHTML=
-"<b>Subtotal: ৳"+total+"</b>";
-
-if(cart.length==0){
-container.innerHTML="<p style='text-align:center'>Cart is Empty</p>";
-document.getElementById("totalBox").innerHTML="";
-}
-
-}
-
-function increase(index){
-cart[index].quantity++;
+function removeItem(i){
+cart.splice(i,1);
 localStorage.setItem("cart",JSON.stringify(cart));
-renderCart();
-}
-
-function decrease(index){
-if(cart[index].quantity>1){
-cart[index].quantity--;
-localStorage.setItem("cart",JSON.stringify(cart));
-renderCart();
-}
-}
-
-function removeItem(index){
-cart.splice(index,1);
-localStorage.setItem("cart",JSON.stringify(cart));
-renderCart();
+location.reload();
 }
 
 function goCheckout(){
-if(cart.length==0){
-alert("Cart is empty");
-return;
+window.location="checkout.html";
 }
-window.location.href="checkout.html";
-}
-
-renderCart();
-
 </script>
 
 </body>
