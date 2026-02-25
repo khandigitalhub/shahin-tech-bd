@@ -6,43 +6,38 @@
 <title>Shahin Tech BD</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f7fb;}
+body{margin:0;font-family:Arial;background:#f2f2f2;padding-bottom:70px;}
 
 header{
-background:linear-gradient(45deg,#111,#2b2b2b);
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#111;
+padding:12px 15px;
 color:#fff;
-padding:15px;
-text-align:center;
-font-size:20px;
-font-weight:bold;
-position:relative;
 }
 
-.support-icons{
-position:absolute;
-right:10px;
-top:15px;
+.logo{
+font-size:18px;
+font-weight:bold;
+color:#00e676;
 }
 
 .support-icons a{
-margin-left:10px;
-color:#25D366;
+margin-left:12px;
+font-size:22px;
 text-decoration:none;
-font-size:18px;
 }
 
 .banner{
-background:linear-gradient(90deg,#ff512f,#dd2476);
+background:#ff3d00;
 color:#fff;
 text-align:center;
-padding:10px;
+padding:8px;
 font-weight:bold;
 }
 
-.search-box{
-padding:10px;
-}
-
+.search-box{padding:10px;}
 .search-box input{
 width:100%;
 padding:10px;
@@ -85,19 +80,11 @@ width:100%;
 border-radius:8px;
 }
 
-.price{
-color:#e91e63;
-font-weight:bold;
-}
-
-.old-price{
-text-decoration:line-through;
-color:#777;
-font-size:12px;
-}
+.price{color:#e91e63;font-weight:bold;}
+.old{text-decoration:line-through;color:#777;font-size:12px;}
 
 .btn{
-background:#111;
+background:#000;
 color:#fff;
 padding:6px;
 text-align:center;
@@ -110,12 +97,14 @@ font-size:14px;
 .bottom-nav{
 position:fixed;
 bottom:0;
+left:0;
 width:100%;
 background:#fff;
 display:flex;
 justify-content:space-around;
 padding:10px 0;
 box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+z-index:999;
 }
 
 .bottom-nav a{
@@ -129,14 +118,14 @@ font-size:14px;
 <body>
 
 <header>
-Shahin Tech BD
+<div class="logo">Shahin Tech BD</div>
 <div class="support-icons">
-<a href="https://wa.me/880XXXXXXXXXX">WhatsApp</a>
-<a href="https://t.me/yourusername">Telegram</a>
+<a href="https://wa.me/8801777127628">🟢</a>
+<a href="https://t.me/yourusername">🔵</a>
 </div>
 </header>
 
-<div class="banner" id="banner">🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥</div>
+<div class="banner" id="banner">🔥 ধামাকা অফার চলছে 🔥</div>
 
 <div class="search-box">
 <input type="text" id="search" placeholder="Search product...">
@@ -153,10 +142,10 @@ Shahin Tech BD
 </div>
 
 <script>
-
 const API="https://script.google.com/macros/s/AKfycbzOkxgutucJ1fsLTLCHAOjCD3UqzoiYNJKmM1UM32aQZqgy1HZOqlSQvixPu2IZaJv3/exec";
 
 let allProducts=[];
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
 
 fetch(API)
 .then(res=>res.json())
@@ -167,7 +156,7 @@ loadCategories(allProducts);
 });
 
 function displayProducts(products){
-const container=document.getElementById("products");
+let container=document.getElementById("products");
 container.innerHTML="";
 products.forEach(p=>{
 container.innerHTML+=`
@@ -175,16 +164,16 @@ container.innerHTML+=`
 <img src="${p.image}">
 <div>${p.name}</div>
 <div class="price">৳${p.newprice}</div>
-<div class="old-price">৳${p.oldprice}</div>
-<div class="btn" onclick="addToCart('${p.id}')">Add to Cart</div>
-<div class="btn" onclick="buyNow('${p.id}')">Buy Now</div>
+<div class="old">৳${p.oldprice}</div>
+<div class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</div>
+<div class="btn" onclick="buyNow()">Buy Now</div>
 </div>`;
 });
 }
 
 function loadCategories(products){
 let cats=[...new Set(products.map(p=>p.category))];
-const catDiv=document.getElementById("categories");
+let catDiv=document.getElementById("categories");
 catDiv.innerHTML=`<div class="category-btn" onclick="displayProducts(allProducts)">All</div>`;
 cats.forEach(c=>{
 catDiv.innerHTML+=`<div class="category-btn" onclick="filterCat('${c}')">${c}</div>`;
@@ -200,21 +189,22 @@ let val=e.target.value.toLowerCase();
 displayProducts(allProducts.filter(p=>p.name.toLowerCase().includes(val)));
 });
 
-function addToCart(id){
+function addToCart(p){
+cart.push(p);
+localStorage.setItem("cart",JSON.stringify(cart));
 alert("Added to cart");
 }
 
-function buyNow(id){
+function buyNow(){
 window.location="checkout.html";
 }
 
 setInterval(()=>{
 document.getElementById("banner").innerText=
 document.getElementById("banner").innerText.includes("ধামাকা")?
-"🚀 আজকের বিশেষ অফার মিস করবেন না":
-"🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥";
-},2000);
-
+"🚀 আজকের বিশেষ অফার":
+"🔥 ধামাকা অফার চলছে 🔥";
+},3000);
 </script>
 
 </body>
