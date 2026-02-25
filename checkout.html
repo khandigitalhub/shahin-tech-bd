@@ -3,146 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout - Shahin Tech BD</title>
+<title>Checkout</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#f4f4f4;
-padding-bottom:120px;
-}
-
-.header{
-background:#111;
-color:white;
-padding:15px;
-text-align:center;
-font-size:18px;
-}
-
-.section{
-background:white;
-margin:10px;
-padding:15px;
-border-radius:10px;
-}
-
-.product{
-display:flex;
-justify-content:space-between;
-margin-bottom:8px;
-font-size:14px;
-}
-
-select{
-width:100%;
-padding:8px;
-margin-top:10px;
-border-radius:6px;
-border:1px solid #ccc;
-}
-
-.total-box{
-background:#fff3e0;
-padding:10px;
-border-radius:8px;
-margin-top:10px;
-font-size:14px;
-}
-
-.pay-btn{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:#ff512f;
-color:white;
+body{font-family:Arial;background:#f2f2f2;padding:10px;padding-bottom:80px;}
+.box{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px;}
+.product{display:flex;gap:10px;margin-bottom:10px;}
+.product img{width:60px;border-radius:6px;}
+.total-box{background:#fff3e0;padding:10px;border-radius:10px;}
+button{
+background:#ff3d00;
+color:#fff;
+padding:12px;
 border:none;
-padding:15px;
+width:100%;
+border-radius:8px;
 font-size:16px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="header">Checkout</div>
+<h2>Checkout</h2>
 
-<div class="section" id="userInfo"></div>
+<div class="box" id="userBox"></div>
 
-<div class="section">
+<div class="box">
 <h3>Products</h3>
 <div id="productList"></div>
 </div>
 
-<div class="section">
+<div class="box">
 <h3>Delivery Option</h3>
-<select id="delivery" onchange="updateTotal()">
-<option value="50">Jaldhaka - ৳50</option>
-<option value="120">Outside District - ৳120</option>
+
+<select id="delivery" onchange="updateTotal()" style="width:100%;padding:8px;border-radius:6px;">
+<option value="50">জলঢাকা উপজেলার ভিতরে - ৫০ টাকা</option>
+<option value="80">নীলফামারী জেলার মধ্যে - ৮০ টাকা</option>
+<option value="120">সারাদেশে - ১২০ টাকা</option>
 </select>
 
-<div class="total-box" id="totalBox"></div>
+<div class="total-box" style="margin-top:10px;">
+<p>Subtotal: ৳<span id="subtotal">0</span></p>
+<p>Delivery: ৳<span id="deliveryCharge">50</span></p>
+<h3>Grand Total: ৳<span id="grandTotal">0</span></h3>
 </div>
 
-<button class="pay-btn" onclick="goPayment()">Proceed to Payment</button>
+</div>
+
+<button onclick="confirmOrder()">Confirm Order</button>
 
 <script>
+let user=JSON.parse(localStorage.getItem("user"));
+if(!user){
+window.location="account.html";
+}
+
+document.getElementById("userBox").innerHTML=`
+<b>${user.name}</b><br>
+${user.phone}<br>
+${user.address}
+`;
 
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
-let user=JSON.parse(localStorage.getItem("userData"));
-
-if(!user){
-alert("Please complete Account Information first");
-window.location.href="account.html";
-}
-
-document.getElementById("userInfo").innerHTML=
-"<b>"+user.name+"</b><br>"+
-user.phone+"<br>"+
-user.address+", "+user.upazila+", "+user.district;
-
 let subtotal=0;
-
-function renderProducts(){
 let list=document.getElementById("productList");
-list.innerHTML="";
-subtotal=0;
 
 cart.forEach(item=>{
-subtotal+=item.price*item.quantity;
-
+subtotal+=Number(item.newprice);
 list.innerHTML+=`
 <div class="product">
-<div>${item.name} (x${item.quantity})</div>
-<div>৳${item.price*item.quantity}</div>
+<img src="${item.image}">
+<div>
+${item.name}<br>
+৳${item.newprice}
 </div>
-`;
+</div>`;
 });
 
-updateTotal();
-}
+document.getElementById("subtotal").innerText=subtotal;
 
 function updateTotal(){
-let delivery=parseInt(document.getElementById("delivery").value);
+let delivery=Number(document.getElementById("delivery").value);
+document.getElementById("deliveryCharge").innerText=delivery;
+document.getElementById("grandTotal").innerText=subtotal+delivery;
+}
+
+updateTotal();
+
+function confirmOrder(){
+let delivery=Number(document.getElementById("delivery").value);
 let grand=subtotal+delivery;
 
-document.getElementById("totalBox").innerHTML=
-"Subtotal: ৳"+subtotal+"<br>"+
-"Delivery: ৳"+delivery+"<br><br>"+
-"<b>Grand Total: ৳"+grand+"</b>";
+localStorage.setItem("grandTotal",grand);
+localStorage.setItem("lastOrder",JSON.stringify(cart));
+localStorage.removeItem("cart");
+
+window.location="payment.html";
 }
-
-function goPayment(){
-localStorage.setItem("deliveryCharge",
-document.getElementById("delivery").value);
-
-window.location.href="payment.html";
-}
-
-renderProducts();
-
 </script>
 
 </body>
