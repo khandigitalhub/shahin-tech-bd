@@ -37,6 +37,18 @@ margin-left:15px;
 font-size:20px;
 }
 
+/* BANNER */
+.banner-slider{
+background:#ff3d00;
+color:white;
+text-align:center;
+padding:8px;
+font-weight:bold;
+}
+
+.slide{display:none;}
+.slide.active{display:block;}
+
 /* SEARCH */
 .search-box{
 padding:10px;
@@ -160,17 +172,25 @@ font-size:18px;
 </div>
 </header>
 
+<div class="banner-slider">
+<div class="slide active">🔥 ধামাকা অফার চলছে 🔥</div>
+<div class="slide">🚀 নতুন পণ্য যুক্ত হয়েছে</div>
+<div class="slide">💥 আজই অর্ডার করুন বিশেষ ডিসকাউন্টে</div>
+<div class="slide">📦 সারাদেশে হোম ডেলিভারি</div>
+</div>
+
 <div class="search-box">
 <input type="text" id="searchInput" placeholder="Search product...">
 </div>
 
-<div class="categories" id="categoryBar">
+<div class="categories">
 <div class="cat-btn active" onclick="filterCategory('All',this)">All</div>
-<div class="cat-btn" onclick="filterCategory('Wall',this)">Wall</div>
-<div class="cat-btn" onclick="filterCategory('Mobile Accessories',this)">Mobile Accessories</div>
-<div class="cat-btn" onclick="filterCategory('Electrical',this)">Electrical</div>
-<div class="cat-btn" onclick="filterCategory('Lighting',this)">Lighting</div>
-<div class="cat-btn" onclick="filterCategory('Offer',this)">Offer</div>
+<div class="cat-btn" onclick="filterCategory('Wiring & Electrical',this)">Wiring</div>
+<div class="cat-btn" onclick="filterCategory('Mobile Phones',this)">Mobile</div>
+<div class="cat-btn" onclick="filterCategory('Mobile Accessories',this)">Accessories</div>
+<div class="cat-btn" onclick="filterCategory('General Electronics',this)">Electronics</div>
+<div class="cat-btn" onclick="filterCategory('Kitchen Appliances',this)">Kitchen</div>
+<div class="cat-btn" onclick="filterCategory('Gadgets & Smart Devices',this)">Smart</div>
 </div>
 
 <div class="products" id="products"></div>
@@ -187,7 +207,6 @@ font-size:18px;
 const API="https://script.google.com/macros/s/AKfycbzOkxgutucJ1fsLTLCHAOjCD3UqzoiYNJKmM1UM32aQZqgy1HZOqlSQvixPu2IZaJv3/exec";
 
 let allProducts=[];
-let currentCategory="All";
 
 fetch(API)
 .then(res=>res.json())
@@ -201,7 +220,10 @@ let container=document.getElementById("products");
 container.innerHTML="";
 
 list.forEach(p=>{
-let discount=Math.round(((p.oldprice-p.newprice)/p.oldprice)*100);
+let discount=0;
+if(p.oldprice && p.oldprice>p.newprice){
+discount=Math.round(((p.oldprice-p.newprice)/p.oldprice)*100);
+}
 
 container.innerHTML+=`
 <div class="card">
@@ -210,14 +232,12 @@ container.innerHTML+=`
 <div class="old-price">৳${p.oldprice}</div>
 <div class="new-price">৳${p.newprice}</div>
 <div class="discount">${discount}% OFF</div>
-<div class="buy-btn" onclick='buyNow(${JSON.stringify(p)})'>Buy Now</div>
+<div class="buy-btn" onclick='viewProduct(${JSON.stringify(p)})'>Buy Now</div>
 </div>`;
 });
 }
 
 function filterCategory(cat,el){
-currentCategory=cat;
-
 document.querySelectorAll(".cat-btn").forEach(btn=>btn.classList.remove("active"));
 el.classList.add("active");
 
@@ -230,16 +250,23 @@ displayProducts(allProducts.filter(p=>p.category===cat));
 
 document.getElementById("searchInput").addEventListener("input",function(){
 let value=this.value.toLowerCase();
-let filtered=allProducts.filter(p=>
-p.name.toLowerCase().includes(value)
-);
+let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
 displayProducts(filtered);
 });
 
-function buyNow(p){
-localStorage.setItem("buyNowProduct",JSON.stringify(p));
-window.location="checkout.html";
+function viewProduct(p){
+localStorage.setItem("selectedProduct",JSON.stringify(p));
+window.location="product.html";
 }
+
+/* Banner Slider */
+let slides=document.querySelectorAll(".slide");
+let index=0;
+setInterval(()=>{
+slides[index].classList.remove("active");
+index=(index+1)%slides.length;
+slides[index].classList.add("active");
+},3000);
 
 </script>
 
