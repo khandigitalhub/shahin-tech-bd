@@ -3,27 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Confirmed</title>
+<title>Order Success</title>
 
 <style>
 body{
+margin:0;
 font-family:Arial;
 background:linear-gradient(135deg,#00c853,#64dd17);
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
-margin:0;
 }
 
-.card{
+.container{
 background:#fff;
-padding:25px;
+width:95%;
+max-width:420px;
+padding:20px;
 border-radius:20px;
-width:90%;
-max-width:400px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-text-align:center;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
 animation:fadeIn 0.5s ease-in-out;
 }
 
@@ -32,59 +31,91 @@ from{opacity:0;transform:scale(0.9);}
 to{opacity:1;transform:scale(1);}
 }
 
-.info-box{
-background:#f1f8e9;
-padding:12px;
-border-radius:10px;
-margin-top:10px;
-text-align:left;
+.success-icon{
+font-size:60px;
+text-align:center;
+color:#00c853;
 }
 
-h2{color:#00c853;}
+.product{
+display:flex;
+gap:10px;
+margin-bottom:8px;
+}
+
+.product img{
+width:50px;
+border-radius:6px;
+}
+
+.total-box{
+background:#f1f8e9;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.countdown{
+text-align:center;
+margin-top:15px;
+font-weight:bold;
+}
 </style>
 </head>
+
 <body>
 
-<div class="card" id="confirmCard"></div>
+<div class="container" id="box"></div>
 
 <script>
-let user=JSON.parse(localStorage.getItem("user"));
-let total=localStorage.getItem("grandTotal");
-let order=JSON.parse(localStorage.getItem("lastOrder"))||[];
-
-let productList="";
-order.forEach(item=>{
-productList+=`${item.name} - ৳${item.newprice}<br>`;
-});
-
-document.getElementById("confirmCard").innerHTML=`
-<h2>✅ অর্ডার সম্পন্ন</h2>
-<p>ধন্যবাদ ${user.name}!</p>
-
-<div class="info-box">
-<b>📞 ফোন:</b> ${user.phone}<br>
-<b>📍 ঠিকানা:</b> ${user.address}<br>
-<b>🛒 পণ্য:</b><br>${productList}
-<b>💰 মোট টাকা:</b> ৳${total}
-</div>
-
-<p style="margin-top:15px;">৩ সেকেন্ড পরে হোমপেজে ফিরে যাবে...</p>
-`;
 
 let orders=JSON.parse(localStorage.getItem("orders"))||[];
-orders.push({
-name:user.name,
-phone:user.phone,
-address:user.address,
-products:order,
-total:total,
-date:new Date().toLocaleString()
+let last=orders[orders.length-1];
+
+if(!last){
+window.location="index.html";
+}
+
+let productHTML="";
+last.products.forEach(p=>{
+productHTML+=`
+<div class="product">
+<img src="${p.image}">
+<div>
+${p.name}<br>
+Qty: ${p.qty}<br>
+৳${p.newprice} × ${p.qty}
+</div>
+</div>`;
 });
-localStorage.setItem("orders",JSON.stringify(orders));
+
+document.getElementById("box").innerHTML=`
+<div class="success-icon">✅</div>
+<h2 style="text-align:center;">অর্ডার সফল হয়েছে</h2>
+
+<p><b>${last.user.name}</b></p>
+<p>📞 ${last.user.phone}</p>
+<p>📍 ${last.user.address}, ${last.user.upazila}, ${last.user.district}</p>
+
+<hr>
+
+${productHTML}
+
+<div class="total-box">
+Subtotal: ৳${last.subtotal}<br>
+Delivery: ৳${last.delivery}<br>
+<b>Total: ৳${last.total}</b>
+</div>
+
+<div class="countdown">
+৫ সেকেন্ড পরে হোমে ফিরে যাবে...
+</div>
+`;
 
 setTimeout(()=>{
 window.location="index.html";
-},3000);
+},5000);
+
 </script>
 
 </body>
