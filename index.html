@@ -1,78 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shahin Tech BD</title>
 
 <style>
-
 body{
 margin:0;
-font-family:Arial;
-background:#f5f5f5;
+font-family:Arial, sans-serif;
+background:#f5f7fb;
 }
 
-/* HEADER */
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:12px;
-background:black;
+header{
+background:linear-gradient(45deg,#111,#2b2b2b);
 color:white;
-position:sticky;
-top:0;
-z-index:1000;
-}
-
-.support-icons img{
-width:26px;
-margin-left:10px;
-}
-
-/* SEARCH */
-.search-box{
 padding:15px;
 text-align:center;
+font-size:20px;
+font-weight:bold;
+}
+
+.banner{
+background:linear-gradient(90deg,#ff512f,#dd2476);
+color:white;
+text-align:center;
+padding:10px;
+font-weight:bold;
+animation:blink 1.5s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1}
+50%{opacity:0.7}
+100%{opacity:1}
+}
+
+.search-box{
+padding:10px;
 }
 
 .search-box input{
-width:90%;
+width:100%;
 padding:10px;
-border-radius:20px;
+border-radius:25px;
 border:1px solid #ccc;
 }
 
-/* BANNER */
-.banner{
-width:100%;
-height:90px;
-overflow:hidden;
-}
-
-.banner img{
-width:100%;
-height:90px;
-object-fit:cover;
-}
-
-/* CATEGORY */
 .categories{
 display:flex;
 overflow-x:auto;
+gap:10px;
 padding:10px;
-background:white;
 }
 
-.categories div{
-margin-right:15px;
-padding:8px 12px;
-background:#eee;
-border-radius:15px;
+.category-btn{
+background:white;
+padding:8px 15px;
+border-radius:20px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+cursor:pointer;
 white-space:nowrap;
 }
 
-/* PRODUCTS */
 .products{
 display:grid;
 grid-template-columns:repeat(2,1fr);
@@ -80,114 +70,150 @@ gap:10px;
 padding:10px;
 }
 
-.product-card{
+.card{
 background:white;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 padding:10px;
-border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+text-align:center;
 }
 
-.product-card img{
+.card img{
 width:100%;
+height:120px;
+object-fit:cover;
 border-radius:10px;
 }
 
-.price{
+.price-old{
+text-decoration:line-through;
+color:gray;
+font-size:13px;
+}
+
+.price-new{
 color:red;
 font-weight:bold;
+font-size:16px;
 }
 
-/* BOTTOM NAV */
-.bottom-nav{
+.discount{
+background:red;
+color:white;
+font-size:12px;
+padding:2px 6px;
+border-radius:10px;
+display:inline-block;
+margin-bottom:5px;
+}
+
+.btn{
+margin-top:5px;
+padding:7px;
+border:none;
+border-radius:20px;
+cursor:pointer;
+width:100%;
+}
+
+.cart-btn{
+background:#007bff;
+color:white;
+}
+
+.buy-btn{
+background:#28a745;
+color:white;
+margin-top:5px;
+}
+
+.bottom-menu{
 position:fixed;
 bottom:0;
-left:0;
-right:0;
+width:100%;
+background:white;
 display:flex;
 justify-content:space-around;
-background:white;
 padding:10px 0;
-box-shadow:0 -2px 5px rgba(0,0,0,0.2);
+box-shadow:0 -3px 10px rgba(0,0,0,0.1);
+font-weight:bold;
 }
-
-.bottom-nav div{
-text-align:center;
-font-size:14px;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div>Shahin Tech BD</div>
-<div class="support-icons">
-<a href="https://wa.me/8801777127628"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"></a>
-<a href="https://t.me/YOUR_BOT_LINK"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"></a>
-</div>
-</div>
+<header>Shahin Tech BD</header>
+
+<div class="banner">🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥</div>
 
 <div class="search-box">
-<input type="text" placeholder="Search product...">
+<input type="text" id="searchInput" placeholder="Search product..." onkeyup="searchProduct()">
 </div>
 
-<div class="banner">
-<img src="https://via.placeholder.com/800x90?text=Special+Offer">
-</div>
+<div class="categories" id="categoryList"></div>
 
-<div class="categories">
-<div>Accessories</div>
-<div>Keyboard</div>
-<div>Headset</div>
-<div>Power Bank</div>
-</div>
+<div class="products" id="productList"></div>
 
-<div class="products">
-
-<div class="product-card" onclick="openProduct()">
-<img src="https://via.placeholder.com/300">
-<h4>RGB Keyboard</h4>
-<div class="price">৳1500</div>
-</div>
-
-<div class="product-card" onclick="openProduct()">
-<img src="https://via.placeholder.com/300">
-<h4>Gaming Headset</h4>
-<div class="price">৳1200</div>
-</div>
-
-</div>
-
-<div style="height:70px;"></div>
-
-<div class="bottom-nav">
-<div onclick="goHome()">Home</div>
-<div onclick="goCategory()">Category</div>
-<div onclick="goOrders()">Orders</div>
-<div onclick="goAccount()">My Account</div>
+<div class="bottom-menu">
+<div>Home</div>
+<div>Category</div>
+<div>Orders</div>
+<div>My Account</div>
 </div>
 
 <script>
 
-function goHome(){
-alert("Home Page");
+const sheetURL = "https://script.google.com/macros/s/AKfycbzX1hQQRG5oNXUOroxULKXiVMs-fqDe7OU_JiZEXhN8d1V8wYlAtd9PtqhxFAbAMUZY/exec";
+
+let allProducts = [];
+
+fetch(sheetURL)
+.then(res => res.json())
+.then(data => {
+allProducts = data;
+displayProducts(data);
+loadCategories(data);
+});
+
+function displayProducts(products){
+let html = "";
+products.forEach(p => {
+if(p.status !== "show") return;
+
+html += `
+<div class="card">
+<div class="discount">${p.discount}</div>
+<img src="${p.image}">
+<h4>${p.name}</h4>
+<div class="price-old">৳${p.oldprice}</div>
+<div class="price-new">৳${p.newprice}</div>
+<button class="btn cart-btn">Add to Cart</button>
+<button class="btn buy-btn">Buy Now</button>
+</div>
+`;
+});
+document.getElementById("productList").innerHTML = html;
 }
 
-function goCategory(){
-alert("Category Page");
+function loadCategories(products){
+let categories = [...new Set(products.map(p => p.category))];
+let html="";
+categories.forEach(cat=>{
+html += `<div class="category-btn" onclick="filterCategory('${cat}')">${cat}</div>`;
+});
+document.getElementById("categoryList").innerHTML=html;
 }
 
-function goOrders(){
-alert("Orders Page");
+function filterCategory(cat){
+let filtered = allProducts.filter(p=>p.category===cat);
+displayProducts(filtered);
 }
 
-function goAccount(){
-alert("My Account Page");
-}
-
-function openProduct(){
-alert("Open Product Details Page");
+function searchProduct(){
+let value=document.getElementById("searchInput").value.toLowerCase();
+let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
+displayProducts(filtered);
 }
 
 </script>
