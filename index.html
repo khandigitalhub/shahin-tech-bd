@@ -8,178 +8,106 @@
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#1e3c72,#2a5298);
-padding-bottom:80px;
+font-family:Arial;
+background:#f4f4f4;
+padding-bottom:70px;
 }
 
-/* HEADER */
 .header{
-background:linear-gradient(90deg,#ff512f,#dd2476);
+background:#111;
 color:white;
-padding:12px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-weight:bold;
-}
-
-.header span{
+padding:15px;
+text-align:center;
 font-size:18px;
 }
 
-.support a{
-color:white;
-margin-left:12px;
-text-decoration:none;
-font-size:20px;
-}
-
-/* SEARCH */
 .search-box{
-display:flex;
-justify-content:center;
-padding:15px;
+padding:10px;
+background:white;
 }
 
 .search-box input{
-width:80%;
+width:100%;
 padding:10px;
-border-radius:25px;
-border:none;
-font-size:14px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
-/* BANNER */
-.banner{
-margin:0 10px 10px;
-height:130px;
-border-radius:15px;
-display:flex;
-align-items:center;
-justify-content:center;
-color:white;
-font-weight:bold;
-font-size:16px;
-text-align:center;
-transition:0.5s;
-}
-
-/* CATEGORY */
-.categories{
-display:flex;
-overflow:auto;
-gap:8px;
-padding:10px;
-}
-
-.categories button{
-background:white;
-border:none;
-padding:6px 12px;
-border-radius:20px;
-font-size:12px;
-}
-
-/* PRODUCTS */
-.container{
+.products{
 display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:8px;
+grid-template-columns:1fr 1fr;
+gap:10px;
 padding:10px;
 }
 
 .card{
 background:white;
+padding:10px;
 border-radius:10px;
-padding:8px;
 }
 
 .card img{
 width:100%;
-height:110px;
+height:120px;
 object-fit:cover;
 border-radius:8px;
 }
 
 .card h4{
-font-size:13px;
 margin:5px 0;
+font-size:14px;
 }
 
 .price{
 color:#ff512f;
 font-weight:bold;
-font-size:14px;
 }
 
-.old{
-font-size:11px;
-text-decoration:line-through;
-color:gray;
-}
-
-.buy{
-width:100%;
-margin-top:6px;
-padding:6px;
-background:#ff512f;
-color:white;
-border:none;
-border-radius:6px;
-font-size:12px;
-}
-
-/* BOTTOM NAV */
 .bottom-nav{
 position:fixed;
 bottom:0;
 left:0;
 right:0;
-background:#111;
+background:white;
 display:flex;
 justify-content:space-around;
-padding:8px 0;
-z-index:9999;
+padding:10px 0;
+box-shadow:0 -3px 10px rgba(0,0,0,0.2);
 }
 
 .bottom-nav a{
-color:white;
 text-decoration:none;
-font-size:12px;
+color:#333;
+font-size:14px;
 text-align:center;
+}
+
+.bottom-nav a.active{
+color:#ff512f;
+font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<span>Shahin Tech BD</span>
-<div class="support">
-<a href="https://wa.me/message/LDJQW3TP4BBBG1" target="_blank">🟢</a>
-<a href="https://t.me/shahintechbd_bot" target="_blank">🔵</a>
-</div>
-</div>
+<div class="header">Shahin Tech BD</div>
 
 <div class="search-box">
-<input type="text" id="searchInput" placeholder="Search product..." onkeyup="searchProduct()">
+<input type="text" id="search" placeholder="Search product..." onkeyup="searchProduct()">
 </div>
 
-<div class="banner" id="banner"></div>
-
-<div class="categories" id="categoryButtons"></div>
-
-<div class="container" id="productList"></div>
+<div class="products" id="productContainer"></div>
 
 <div class="bottom-nav">
-<a href="index.html">🏠<br>Home</a>
-<a href="#" onclick="scrollToCategory()">📂<br>Category</a>
-<a href="orders.html">🛒<br>Orders</a>
-<a href="account.html">👤<br>Account</a>
+<a href="index.html" class="active">Home</a>
+<a href="cart.html">Cart</a>
+<a href="orders.html">Orders</a>
+<a href="account.html">Account</a>
 </div>
 
 <script>
+
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
 
 let allProducts=[];
@@ -188,73 +116,40 @@ fetch(SHEET_URL)
 .then(res=>res.json())
 .then(data=>{
 allProducts=data;
-displayProducts(data);
-createCategoryButtons(data);
+showProducts(data);
 });
 
-/* PRODUCT SHOW */
-function displayProducts(data){
-const container=document.getElementById("productList");
+function showProducts(products){
+
+let container=document.getElementById("productContainer");
 container.innerHTML="";
-data.slice(0,6).forEach(product=>{
+
+products.forEach(product=>{
 container.innerHTML+=`
-<div class="card">
-<img src="${product.image}" onerror="this.src='https://via.placeholder.com/300x200'">
+<div class="card" onclick="goProduct('${product.id}')">
+<img src="${product.image}" onerror="this.src='https://via.placeholder.com/150'">
 <h4>${product.name}</h4>
-<div class="old">৳${product.oldprice}</div>
 <div class="price">৳${product.price}</div>
-<a href="product.html?id=${product.id}">
-<button class="buy">Buy</button>
-</a>
-</div>`;
+</div>
+`;
 });
+
 }
 
-/* CATEGORY */
-function createCategoryButtons(data){
-const cat=document.getElementById("categoryButtons");
-let categories=[...new Set(data.map(p=>p.category.toLowerCase()))];
-cat.innerHTML=`<button onclick="displayProducts(allProducts)">All</button>`;
-categories.forEach(c=>{
-cat.innerHTML+=`<button onclick="filterCategory('${c}')">${c}</button>`;
-});
+function goProduct(id){
+window.location.href="product.html?id="+id;
 }
 
-function filterCategory(cat){
-const filtered=allProducts.filter(p=>p.category.toLowerCase()==cat);
-displayProducts(filtered);
-}
-
-/* SEARCH */
 function searchProduct(){
-const val=document.getElementById("searchInput").value.toLowerCase();
-const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(val));
-displayProducts(filtered);
+let value=document.getElementById("search").value.toLowerCase();
+
+let filtered=allProducts.filter(p=>
+p.name.toLowerCase().includes(value)
+);
+
+showProducts(filtered);
 }
 
-/* BANNER AUTO SLIDE */
-const banners=[
-"🔥 Eid Offer - Buy 1 Get 1 Free",
-"🚚 3 Products = Free Delivery",
-"⚡ Flash Sale - Up to 50% OFF",
-"💎 Premium Quality Gadgets",
-"🎁 Special Discount This Week"
-];
-
-let bIndex=0;
-function changeBanner(){
-const banner=document.getElementById("banner");
-banner.style.background=`linear-gradient(90deg,#ff512f,#dd2476)`;
-banner.innerHTML=banners[bIndex];
-bIndex=(bIndex+1)%banners.length;
-}
-setInterval(changeBanner,2500);
-changeBanner();
-
-/* SCROLL CATEGORY */
-function scrollToCategory(){
-window.scrollTo({top:300,behavior:"smooth"});
-}
 </script>
 
 </body>
