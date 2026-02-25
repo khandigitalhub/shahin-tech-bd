@@ -3,132 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment</title>
+<title>Order Confirmed</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#f4f4f4;padding-bottom:100px;}
-.header{background:#111;color:white;padding:15px;text-align:center;}
-.section{background:white;margin:10px;padding:15px;border-radius:10px;}
-.method{border:1px solid #ddd;padding:12px;margin-top:10px;border-radius:8px;cursor:pointer;}
-.method.active{border:2px solid #ff512f;background:#fff3e0;}
-.number-box{background:#f9f9f9;padding:8px;margin-top:8px;border-radius:6px;font-size:14px;}
-input{width:100%;padding:8px;margin-top:10px;border-radius:6px;border:1px solid #ccc;}
-.pay-btn{position:fixed;bottom:0;left:0;right:0;background:#ff512f;color:white;border:none;padding:15px;font-size:16px;}
-.success-box{position:fixed;top:0;left:0;right:0;bottom:0;background:white;display:none;justify-content:center;align-items:center;text-align:center;padding:20px;}
-.success-box h2{color:green;}
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#00c853,#64dd17);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.card{
+background:#fff;
+padding:25px;
+border-radius:20px;
+width:90%;
+max-width:400px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+text-align:center;
+animation:fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:scale(0.9);}
+to{opacity:1;transform:scale(1);}
+}
+
+.info-box{
+background:#f1f8e9;
+padding:12px;
+border-radius:10px;
+margin-top:10px;
+text-align:left;
+}
+
+h2{color:#00c853;}
 </style>
 </head>
-
 <body>
 
-<div class="header">Payment Method</div>
-
-<div class="section">
-
-<div class="method" onclick="selectMethod('cod')" id="cod">
-<b>Cash On Delivery</b>
-</div>
-
-<div class="method" onclick="selectMethod('bkash')" id="bkash">
-<b>Bkash</b>
-<div class="number-box">Send Money To: 01777127628</div>
-</div>
-
-<div class="method" onclick="selectMethod('nagad')" id="nagad">
-<b>Nagad</b>
-<div class="number-box">Send Money To: 01777127628</div>
-</div>
-
-<input type="text" id="trx" placeholder="Transaction ID (Bkash/Nagad Only)">
-
-</div>
-
-<button class="pay-btn" onclick="placeOrder()">Confirm Order</button>
-
-<div class="success-box" id="successBox"></div>
+<div class="card" id="confirmCard"></div>
 
 <script>
+let user=JSON.parse(localStorage.getItem("user"));
+let total=localStorage.getItem("grandTotal");
+let order=JSON.parse(localStorage.getItem("lastOrder"))||[];
 
-let selected="cod";
-document.getElementById("cod").classList.add("active");
-document.getElementById("trx").style.display="none";
-
-function selectMethod(type){
-selected=type;
-document.querySelectorAll(".method").forEach(m=>m.classList.remove("active"));
-document.getElementById(type).classList.add("active");
-
-if(type=="cod"){
-document.getElementById("trx").style.display="none";
-}else{
-document.getElementById("trx").style.display="block";
-}
-}
-
-function placeOrder(){
-
-if((selected=="bkash"||selected=="nagad") && 
-document.getElementById("trx").value==""){
-alert("Enter Transaction ID");
-return;
-}
-
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-let user=JSON.parse(localStorage.getItem("userData"));
-let delivery=localStorage.getItem("deliveryCharge")||0;
-
-let orderId="ORD"+new Date().getTime();
-
-let productText="";
-let total=0;
-
-cart.forEach(item=>{
-let itemTotal=item.price*item.quantity;
-total+=itemTotal;
-productText+=item.name+" | Qty:"+item.quantity+" | Total:"+itemTotal+"\n";
+let productList="";
+order.forEach(item=>{
+productList+=`${item.name} - ৳${item.newprice}<br>`;
 });
 
-total+=parseInt(delivery);
+document.getElementById("confirmCard").innerHTML=`
+<h2>✅ অর্ডার সম্পন্ন</h2>
+<p>ধন্যবাদ ${user.name}!</p>
 
-let orderData={
-customername:user.name,
-phone:user.phone,
-address:user.address+", "+user.upazila+", "+user.district,
-paymentmethod:selected.toUpperCase(),
-productlist:productText+"Delivery:"+delivery+" | Grand Total:"+total
-};
-
-fetch("https://script.google.com/macros/s/AKfycbxeUxtZOpRcyorV-cnbHyr82lgTUxTem6yn29d80qgKmrmWjqbV84NP6lhDkwcAWsWG/exec",{
-method:"POST",
-body:JSON.stringify(orderData)
-});
-
-let successBox=document.getElementById("successBox");
-successBox.style.display="flex";
-successBox.innerHTML=`
-<div>
-<h2>Order Confirmed ✅</h2>
-<p><b>Order ID:</b> ${orderId}</p>
-<p>Thank you for your order.</p>
-<p>We will contact you soon.</p>
+<div class="info-box">
+<b>📞 ফোন:</b> ${user.phone}<br>
+<b>📍 ঠিকানা:</b> ${user.address}<br>
+<b>🛒 পণ্য:</b><br>${productList}
+<b>💰 মোট টাকা:</b> ৳${total}
 </div>
+
+<p style="margin-top:15px;">৩ সেকেন্ড পরে হোমপেজে ফিরে যাবে...</p>
 `;
 
-localStorage.setItem("lastOrder",JSON.stringify({
-orderId:orderId,
-products:productText,
+let orders=JSON.parse(localStorage.getItem("orders"))||[];
+orders.push({
+name:user.name,
+phone:user.phone,
+address:user.address,
+products:order,
 total:total,
-status:"Pending"
-}));
-
-localStorage.removeItem("cart");
+date:new Date().toLocaleString()
+});
+localStorage.setItem("orders",JSON.stringify(orders));
 
 setTimeout(()=>{
-window.location.href="index.html";
+window.location="index.html";
 },3000);
-
-}
-
 </script>
 
 </body>
