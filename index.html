@@ -8,118 +8,145 @@
 <style>
 body{
 margin:0;
-font-family:Arial;
-background:#f1f1f1;
-padding-bottom:70px;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+padding-bottom:80px;
 }
 
+/* HEADER */
 .header{
-background:#0d1b2a;
+background:linear-gradient(90deg,#ff512f,#dd2476);
 color:white;
 padding:12px;
 display:flex;
 justify-content:space-between;
+align-items:center;
 font-weight:bold;
 }
 
+.header span{
+font-size:18px;
+}
+
+.support a{
+color:white;
+margin-left:12px;
+text-decoration:none;
+font-size:20px;
+}
+
+/* SEARCH */
 .search-box{
-background:white;
-padding:10px;
+display:flex;
+justify-content:center;
+padding:15px;
 }
 
 .search-box input{
-width:100%;
+width:80%;
 padding:10px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:15px;
+border-radius:25px;
+border:none;
+font-size:14px;
 }
 
+/* BANNER */
+.banner{
+margin:0 10px 10px;
+height:130px;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-weight:bold;
+font-size:16px;
+text-align:center;
+transition:0.5s;
+}
+
+/* CATEGORY */
 .categories{
 display:flex;
 overflow:auto;
 gap:8px;
 padding:10px;
-background:white;
 }
 
 .categories button{
-background:#0d1b2a;
-color:white;
+background:white;
 border:none;
-padding:7px 12px;
+padding:6px 12px;
 border-radius:20px;
-white-space:nowrap;
-font-size:13px;
+font-size:12px;
 }
 
+/* PRODUCTS */
 .container{
-padding:10px;
 display:grid;
 grid-template-columns:repeat(2,1fr);
-gap:10px;
+gap:8px;
+padding:10px;
 }
 
 .card{
 background:white;
 border-radius:10px;
-padding:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+padding:8px;
 }
 
 .card img{
 width:100%;
+height:110px;
+object-fit:cover;
 border-radius:8px;
 }
 
-.old{
-color:gray;
-text-decoration:line-through;
+.card h4{
 font-size:13px;
+margin:5px 0;
 }
 
 .price{
-color:#ff6a00;
+color:#ff512f;
 font-weight:bold;
-font-size:16px;
+font-size:14px;
 }
 
-.badge{
-background:red;
-color:white;
+.old{
 font-size:11px;
-padding:3px 6px;
-border-radius:5px;
-display:inline-block;
-margin-top:4px;
+text-decoration:line-through;
+color:gray;
 }
 
 .buy{
 width:100%;
-padding:8px;
-margin-top:8px;
-background:#ff6a00;
-border:none;
+margin-top:6px;
+padding:6px;
+background:#ff512f;
 color:white;
+border:none;
 border-radius:6px;
-font-weight:bold;
+font-size:12px;
 }
 
+/* BOTTOM NAV */
 .bottom-nav{
 position:fixed;
 bottom:0;
 left:0;
 right:0;
-background:#0d1b2a;
+background:#111;
 display:flex;
 justify-content:space-around;
 padding:8px 0;
+z-index:9999;
 }
 
 .bottom-nav a{
 color:white;
 text-decoration:none;
-font-size:13px;
+font-size:12px;
 text-align:center;
 }
 </style>
@@ -128,13 +155,18 @@ text-align:center;
 <body>
 
 <div class="header">
-<div>Shahin Tech BD</div>
-<div>Premium Tech</div>
+<span>Shahin Tech BD</span>
+<div class="support">
+<a href="https://wa.me/message/LDJQW3TP4BBBG1" target="_blank">🟢</a>
+<a href="https://t.me/shahintechbd_bot" target="_blank">🔵</a>
+</div>
 </div>
 
 <div class="search-box">
 <input type="text" id="searchInput" placeholder="Search product..." onkeyup="searchProduct()">
 </div>
+
+<div class="banner" id="banner"></div>
 
 <div class="categories" id="categoryButtons"></div>
 
@@ -142,13 +174,12 @@ text-align:center;
 
 <div class="bottom-nav">
 <a href="index.html">🏠<br>Home</a>
-<a href="#">📂<br>Category</a>
-<a href="#">🛒<br>Orders</a>
+<a href="#" onclick="scrollToCategory()">📂<br>Category</a>
+<a href="orders.html">🛒<br>Orders</a>
 <a href="account.html">👤<br>Account</a>
 </div>
 
 <script>
-
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
 
 let allProducts=[];
@@ -161,53 +192,69 @@ displayProducts(data);
 createCategoryButtons(data);
 });
 
+/* PRODUCT SHOW */
 function displayProducts(data){
 const container=document.getElementById("productList");
 container.innerHTML="";
-data.forEach(product=>{
+data.slice(0,6).forEach(product=>{
 container.innerHTML+=`
 <div class="card">
-<img src="${product.image}">
+<img src="${product.image}" onerror="this.src='https://via.placeholder.com/300x200'">
 <h4>${product.name}</h4>
 <div class="old">৳${product.oldprice}</div>
 <div class="price">৳${product.price}</div>
-<div class="badge">${product.discount}% OFF</div>
 <a href="product.html?id=${product.id}">
-<button class="buy">Buy Now</button>
+<button class="buy">Buy</button>
 </a>
-</div>
-`;
+</div>`;
 });
 }
 
+/* CATEGORY */
 function createCategoryButtons(data){
-const catContainer=document.getElementById("categoryButtons");
+const cat=document.getElementById("categoryButtons");
 let categories=[...new Set(data.map(p=>p.category.toLowerCase()))];
-
-catContainer.innerHTML=`<button onclick="filterCategory('all')">All</button>`;
-
-categories.forEach(cat=>{
-catContainer.innerHTML+=`
-<button onclick="filterCategory('${cat}')">${cat}</button>
-`;
+cat.innerHTML=`<button onclick="displayProducts(allProducts)">All</button>`;
+categories.forEach(c=>{
+cat.innerHTML+=`<button onclick="filterCategory('${c}')">${c}</button>`;
 });
 }
 
 function filterCategory(cat){
-if(cat=="all"){
-displayProducts(allProducts);
-return;
-}
 const filtered=allProducts.filter(p=>p.category.toLowerCase()==cat);
 displayProducts(filtered);
 }
 
+/* SEARCH */
 function searchProduct(){
-const value=document.getElementById("searchInput").value.toLowerCase();
-const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
+const val=document.getElementById("searchInput").value.toLowerCase();
+const filtered=allProducts.filter(p=>p.name.toLowerCase().includes(val));
 displayProducts(filtered);
 }
 
+/* BANNER AUTO SLIDE */
+const banners=[
+"🔥 Eid Offer - Buy 1 Get 1 Free",
+"🚚 3 Products = Free Delivery",
+"⚡ Flash Sale - Up to 50% OFF",
+"💎 Premium Quality Gadgets",
+"🎁 Special Discount This Week"
+];
+
+let bIndex=0;
+function changeBanner(){
+const banner=document.getElementById("banner");
+banner.style.background=`linear-gradient(90deg,#ff512f,#dd2476)`;
+banner.innerHTML=banners[bIndex];
+bIndex=(bIndex+1)%banners.length;
+}
+setInterval(changeBanner,2500);
+changeBanner();
+
+/* SCROLL CATEGORY */
+function scrollToCategory(){
+window.scrollTo({top:300,behavior:"smooth"});
+}
 </script>
 
 </body>
