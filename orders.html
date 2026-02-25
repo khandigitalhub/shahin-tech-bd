@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders</title>
+<style>
+body{font-family:Arial;background:#f4f4f4;margin:0;padding:10px;}
+.order-box{background:white;padding:15px;border-radius:10px;margin-bottom:10px;}
+.cancel-btn{background:red;color:white;border:none;padding:6px 10px;border-radius:6px;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<h2>My Orders</h2>
+
+<div id="orders"></div>
+
+<script>
+
+let order=JSON.parse(localStorage.getItem("lastOrder"));
+
+if(order){
+document.getElementById("orders").innerHTML=`
+<div class="order-box">
+<b>Order ID:</b> ${order.orderId}<br><br>
+<pre>${order.products}</pre>
+<b>Total:</b> ৳${order.total}<br>
+<b>Status:</b> ${order.status}<br>
+<button class="cancel-btn" onclick="cancelOrder()">Cancel Order</button>
+</div>
+`;
+}else{
+document.getElementById("orders").innerHTML="No Orders Found";
+}
+
+function cancelOrder(){
+localStorage.removeItem("lastOrder");
+alert("Order Cancelled");
+location.reload();
+}
+
+</script>
+
+</body>
+</html>
