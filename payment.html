@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment - Shahin Tech BD</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#f4f4f4;
+padding-bottom:120px;
+}
+
+.header{
+background:#111;
+color:white;
+padding:15px;
+text-align:center;
+font-size:18px;
+}
+
+.section{
+background:white;
+margin:10px;
+padding:15px;
+border-radius:10px;
+}
+
+.method{
+border:1px solid #ddd;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.method.active{
+border:2px solid #ff512f;
+background:#fff3e0;
+}
+
+.number-box{
+background:#f9f9f9;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+font-size:14px;
+}
+
+input{
+width:100%;
+padding:8px;
+margin-top:10px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.pay-btn{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#ff512f;
+color:white;
+border:none;
+padding:15px;
+font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Payment Method</div>
+
+<div class="section">
+
+<div class="method" onclick="selectMethod('bkash')" id="bkash">
+<b>Bkash</b>
+<div class="number-box">
+Send Money To: 01777127628
+</div>
+</div>
+
+<div class="method" onclick="selectMethod('nagad')" id="nagad">
+<b>Nagad</b>
+<div class="number-box">
+Send Money To: 01777127628
+</div>
+</div>
+
+<div class="method" onclick="selectMethod('cod')" id="cod">
+<b>Cash On Delivery</b>
+</div>
+
+<input type="text" id="trx" placeholder="Transaction ID (Bkash/Nagad Only)">
+
+</div>
+
+<button class="pay-btn" onclick="placeOrder()">Place Order</button>
+
+<script>
+
+let selected="";
+
+function selectMethod(type){
+
+selected=type;
+
+document.querySelectorAll(".method").forEach(m=>{
+m.classList.remove("active");
+});
+
+document.getElementById(type).classList.add("active");
+
+if(type=="cod"){
+document.getElementById("trx").style.display="none";
+}else{
+document.getElementById("trx").style.display="block";
+}
+}
+
+function placeOrder(){
+
+if(selected==""){
+alert("Select Payment Method");
+return;
+}
+
+if((selected=="bkash"||selected=="nagad") && 
+document.getElementById("trx").value==""){
+alert("Enter Transaction ID");
+return;
+}
+
+alert("Order Placed Successfully!");
+
+localStorage.removeItem("cart");
+
+window.location.href="index.html";
+}
+
+</script>
+
+</body>
+</html>
