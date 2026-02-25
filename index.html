@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shahin Tech BD</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-body{margin:0;font-family:Arial;background:#f2f2f2;padding-bottom:70px;}
+body{margin:0;font-family:Arial;background:#f2f2f2;padding-bottom:80px;}
 
 header{
 display:flex;
@@ -15,6 +17,9 @@ align-items:center;
 background:#111;
 padding:12px 15px;
 color:#fff;
+position:sticky;
+top:0;
+z-index:1000;
 }
 
 .logo{
@@ -24,9 +29,9 @@ color:#00e676;
 }
 
 .support-icons a{
-margin-left:12px;
+margin-left:15px;
 font-size:22px;
-text-decoration:none;
+color:white;
 }
 
 .banner{
@@ -35,30 +40,6 @@ color:#fff;
 text-align:center;
 padding:8px;
 font-weight:bold;
-}
-
-.search-box{padding:10px;}
-.search-box input{
-width:100%;
-padding:10px;
-border-radius:25px;
-border:1px solid #ccc;
-}
-
-.categories{
-display:flex;
-overflow-x:auto;
-gap:10px;
-padding:10px;
-}
-
-.category-btn{
-background:#fff;
-padding:8px 15px;
-border-radius:20px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-cursor:pointer;
-white-space:nowrap;
 }
 
 .products{
@@ -75,13 +56,9 @@ box-shadow:0 4px 10px rgba(0,0,0,0.1);
 padding:10px;
 }
 
-.card img{
-width:100%;
-border-radius:8px;
-}
+.card img{width:100%;border-radius:8px;}
 
 .price{color:#e91e63;font-weight:bold;}
-.old{text-decoration:line-through;color:#777;font-size:12px;}
 
 .btn{
 background:#000;
@@ -91,7 +68,6 @@ text-align:center;
 border-radius:6px;
 margin-top:5px;
 cursor:pointer;
-font-size:14px;
 }
 
 .bottom-nav{
@@ -102,9 +78,9 @@ width:100%;
 background:#fff;
 display:flex;
 justify-content:space-around;
-padding:10px 0;
-box-shadow:0 -2px 10px rgba(0,0,0,0.1);
-z-index:999;
+padding:12px 0;
+box-shadow:0 -2px 10px rgba(0,0,0,0.2);
+z-index:2000;
 }
 
 .bottom-nav a{
@@ -120,18 +96,13 @@ font-size:14px;
 <header>
 <div class="logo">Shahin Tech BD</div>
 <div class="support-icons">
-<a href="https://wa.me/8801777127628">🟢</a>
-<a href="https://t.me/yourusername">🔵</a>
+<a href="https://wa.me/8801777127628"><i class="fab fa-whatsapp" style="color:#25D366"></i></a>
+<a href="#"><i class="fab fa-telegram" style="color:#0088cc"></i></a>
 </div>
 </header>
 
-<div class="banner" id="banner">🔥 ধামাকা অফার চলছে 🔥</div>
+<div class="banner">🔥 ধামাকা অফার চলছে 🔥</div>
 
-<div class="search-box">
-<input type="text" id="search" placeholder="Search product...">
-</div>
-
-<div class="categories" id="categories"></div>
 <div class="products" id="products"></div>
 
 <div class="bottom-nav">
@@ -144,67 +115,44 @@ font-size:14px;
 <script>
 const API="https://script.google.com/macros/s/AKfycbzOkxgutucJ1fsLTLCHAOjCD3UqzoiYNJKmM1UM32aQZqgy1HZOqlSQvixPu2IZaJv3/exec";
 
-let allProducts=[];
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-
 fetch(API)
 .then(res=>res.json())
 .then(data=>{
-allProducts=data.filter(p=>p.status==="show");
-displayProducts(allProducts);
-loadCategories(allProducts);
-});
-
-function displayProducts(products){
+let show=data.filter(p=>p.status==="show");
 let container=document.getElementById("products");
-container.innerHTML="";
-products.forEach(p=>{
+show.forEach(p=>{
 container.innerHTML+=`
 <div class="card">
 <img src="${p.image}">
-<div>${p.name}</div>
+<h4>${p.name}</h4>
 <div class="price">৳${p.newprice}</div>
-<div class="old">৳${p.oldprice}</div>
-<div class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</div>
-<div class="btn" onclick="buyNow()">Buy Now</div>
+
+<div>
+<label>Qty:</label>
+<input type="number" min="1" value="1" id="qty${p.id}" style="width:60px">
+</div>
+
+<div class="btn" onclick='addToCart(${JSON.stringify(p)},${p.id})'>Add to Cart</div>
+<div class="btn" onclick='buyNow(${JSON.stringify(p)},${p.id})'>Buy Now</div>
 </div>`;
 });
-}
-
-function loadCategories(products){
-let cats=[...new Set(products.map(p=>p.category))];
-let catDiv=document.getElementById("categories");
-catDiv.innerHTML=`<div class="category-btn" onclick="displayProducts(allProducts)">All</div>`;
-cats.forEach(c=>{
-catDiv.innerHTML+=`<div class="category-btn" onclick="filterCat('${c}')">${c}</div>`;
-});
-}
-
-function filterCat(cat){
-displayProducts(allProducts.filter(p=>p.category===cat));
-}
-
-document.getElementById("search").addEventListener("input",e=>{
-let val=e.target.value.toLowerCase();
-displayProducts(allProducts.filter(p=>p.name.toLowerCase().includes(val)));
 });
 
-function addToCart(p){
+function addToCart(p,id){
+let qty=document.getElementById("qty"+id).value;
+p.qty=Number(qty);
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
 cart.push(p);
 localStorage.setItem("cart",JSON.stringify(cart));
 alert("Added to cart");
 }
 
-function buyNow(){
+function buyNow(p,id){
+let qty=document.getElementById("qty"+id).value;
+p.qty=Number(qty);
+localStorage.setItem("buyNowProduct",JSON.stringify(p));
 window.location="checkout.html";
 }
-
-setInterval(()=>{
-document.getElementById("banner").innerText=
-document.getElementById("banner").innerText.includes("ধামাকা")?
-"🚀 আজকের বিশেষ অফার":
-"🔥 ধামাকা অফার চলছে 🔥";
-},3000);
 </script>
 
 </body>
