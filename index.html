@@ -6,34 +6,37 @@
 <title>Shahin Tech BD</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#f5f7fb;
-}
+body{margin:0;font-family:Arial;background:#f5f7fb;}
 
 header{
 background:linear-gradient(45deg,#111,#2b2b2b);
-color:white;
+color:#fff;
 padding:15px;
 text-align:center;
 font-size:20px;
 font-weight:bold;
+position:relative;
+}
+
+.support-icons{
+position:absolute;
+right:10px;
+top:15px;
+}
+
+.support-icons a{
+margin-left:10px;
+color:#25D366;
+text-decoration:none;
+font-size:18px;
 }
 
 .banner{
 background:linear-gradient(90deg,#ff512f,#dd2476);
-color:white;
+color:#fff;
 text-align:center;
 padding:10px;
 font-weight:bold;
-animation:blink 1.5s infinite;
-}
-
-@keyframes blink{
-0%{opacity:1}
-50%{opacity:0.7}
-100%{opacity:1}
 }
 
 .search-box{
@@ -55,7 +58,7 @@ padding:10px;
 }
 
 .category-btn{
-background:white;
+background:#fff;
 padding:8px 15px;
 border-radius:20px;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
@@ -71,150 +74,146 @@ padding:10px;
 }
 
 .card{
-background:white;
+background:#fff;
 border-radius:12px;
 box-shadow:0 4px 10px rgba(0,0,0,0.1);
 padding:10px;
-text-align:center;
 }
 
 .card img{
 width:100%;
-height:120px;
-object-fit:cover;
-border-radius:10px;
+border-radius:8px;
 }
 
-.price-old{
-text-decoration:line-through;
-color:gray;
-font-size:13px;
-}
-
-.price-new{
-color:red;
+.price{
+color:#e91e63;
 font-weight:bold;
-font-size:16px;
 }
 
-.discount{
-background:red;
-color:white;
+.old-price{
+text-decoration:line-through;
+color:#777;
 font-size:12px;
-padding:2px 6px;
-border-radius:10px;
-display:inline-block;
-margin-bottom:5px;
 }
 
 .btn{
+background:#111;
+color:#fff;
+padding:6px;
+text-align:center;
+border-radius:6px;
 margin-top:5px;
-padding:7px;
-border:none;
-border-radius:20px;
 cursor:pointer;
-width:100%;
+font-size:14px;
 }
 
-.cart-btn{
-background:#007bff;
-color:white;
-}
-
-.buy-btn{
-background:#28a745;
-color:white;
-margin-top:5px;
-}
-
-.bottom-menu{
+.bottom-nav{
 position:fixed;
 bottom:0;
 width:100%;
-background:white;
+background:#fff;
 display:flex;
 justify-content:space-around;
 padding:10px 0;
-box-shadow:0 -3px 10px rgba(0,0,0,0.1);
-font-weight:bold;
+box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.bottom-nav a{
+text-decoration:none;
+color:#111;
+font-size:14px;
 }
 </style>
 </head>
 
 <body>
 
-<header>Shahin Tech BD</header>
+<header>
+Shahin Tech BD
+<div class="support-icons">
+<a href="https://wa.me/880XXXXXXXXXX">WhatsApp</a>
+<a href="https://t.me/yourusername">Telegram</a>
+</div>
+</header>
 
-<div class="banner">🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥</div>
+<div class="banner" id="banner">🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥</div>
 
 <div class="search-box">
-<input type="text" id="searchInput" placeholder="Search product..." onkeyup="searchProduct()">
+<input type="text" id="search" placeholder="Search product...">
 </div>
 
-<div class="categories" id="categoryList"></div>
+<div class="categories" id="categories"></div>
+<div class="products" id="products"></div>
 
-<div class="products" id="productList"></div>
-
-<div class="bottom-menu">
-<div>Home</div>
-<div>Category</div>
-<div>Orders</div>
-<div>My Account</div>
+<div class="bottom-nav">
+<a href="index.html">Home</a>
+<a href="cart.html">Cart</a>
+<a href="orders.html">Orders</a>
+<a href="account.html">My Account</a>
 </div>
 
 <script>
 
-const sheetURL = "https://script.google.com/macros/s/AKfycbzX1hQQRG5oNXUOroxULKXiVMs-fqDe7OU_JiZEXhN8d1V8wYlAtd9PtqhxFAbAMUZY/exec";
+const API="https://script.google.com/macros/s/AKfycbzOkxgutucJ1fsLTLCHAOjCD3UqzoiYNJKmM1UM32aQZqgy1HZOqlSQvixPu2IZaJv3/exec";
 
-let allProducts = [];
+let allProducts=[];
 
-fetch(sheetURL)
-.then(res => res.json())
-.then(data => {
-allProducts = data;
-displayProducts(data);
-loadCategories(data);
+fetch(API)
+.then(res=>res.json())
+.then(data=>{
+allProducts=data.filter(p=>p.status==="show");
+displayProducts(allProducts);
+loadCategories(allProducts);
 });
 
 function displayProducts(products){
-let html = "";
-products.forEach(p => {
-if(p.status !== "show") return;
-
-html += `
+const container=document.getElementById("products");
+container.innerHTML="";
+products.forEach(p=>{
+container.innerHTML+=`
 <div class="card">
-<div class="discount">${p.discount}</div>
 <img src="${p.image}">
-<h4>${p.name}</h4>
-<div class="price-old">৳${p.oldprice}</div>
-<div class="price-new">৳${p.newprice}</div>
-<button class="btn cart-btn">Add to Cart</button>
-<button class="btn buy-btn">Buy Now</button>
-</div>
-`;
+<div>${p.name}</div>
+<div class="price">৳${p.newprice}</div>
+<div class="old-price">৳${p.oldprice}</div>
+<div class="btn" onclick="addToCart('${p.id}')">Add to Cart</div>
+<div class="btn" onclick="buyNow('${p.id}')">Buy Now</div>
+</div>`;
 });
-document.getElementById("productList").innerHTML = html;
 }
 
 function loadCategories(products){
-let categories = [...new Set(products.map(p => p.category))];
-let html="";
-categories.forEach(cat=>{
-html += `<div class="category-btn" onclick="filterCategory('${cat}')">${cat}</div>`;
+let cats=[...new Set(products.map(p=>p.category))];
+const catDiv=document.getElementById("categories");
+catDiv.innerHTML=`<div class="category-btn" onclick="displayProducts(allProducts)">All</div>`;
+cats.forEach(c=>{
+catDiv.innerHTML+=`<div class="category-btn" onclick="filterCat('${c}')">${c}</div>`;
 });
-document.getElementById("categoryList").innerHTML=html;
 }
 
-function filterCategory(cat){
-let filtered = allProducts.filter(p=>p.category===cat);
-displayProducts(filtered);
+function filterCat(cat){
+displayProducts(allProducts.filter(p=>p.category===cat));
 }
 
-function searchProduct(){
-let value=document.getElementById("searchInput").value.toLowerCase();
-let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
-displayProducts(filtered);
+document.getElementById("search").addEventListener("input",e=>{
+let val=e.target.value.toLowerCase();
+displayProducts(allProducts.filter(p=>p.name.toLowerCase().includes(val)));
+});
+
+function addToCart(id){
+alert("Added to cart");
 }
+
+function buyNow(id){
+window.location="checkout.html";
+}
+
+setInterval(()=>{
+document.getElementById("banner").innerText=
+document.getElementById("banner").innerText.includes("ধামাকা")?
+"🚀 আজকের বিশেষ অফার মিস করবেন না":
+"🔥 ধামাকা অফার চলছে এখনই কিনুন 🔥";
+},2000);
 
 </script>
 
