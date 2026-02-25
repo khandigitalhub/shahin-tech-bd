@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shahin Tech BD</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 body{
 margin:0;
@@ -14,55 +12,48 @@ font-family:Arial;
 background:#f4f4f4;
 padding-bottom:90px;
 }
-
-/* HEADER */
 header{
 background:#111;
 color:#fff;
 padding:12px 15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.logo{
-color:#00e676;
+text-align:center;
 font-size:18px;
+}
+.products{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
+}
+.card{
+background:white;
+border-radius:12px;
+padding:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+.card img{
+width:100%;
+border-radius:8px;
+}
+.old-price{
+text-decoration:line-through;
+color:gray;
+font-size:13px;
+}
+.new-price{
+color:#e91e63;
 font-weight:bold;
 }
-
-.icons a{
-color:white;
-margin-left:15px;
-font-size:20px;
-}
-
-/* BANNER */
-.banner-slider{
-background:#ff3d00;
+.buy-btn{
+background:#000;
 color:white;
 text-align:center;
-padding:8px;
-font-weight:bold;
+padding:7px;
+border-radius:6px;
+margin-top:6px;
+display:block;
+text-decoration:none;
 }
-
-.slide{display:none;}
-.slide.active{display:block;}
-
-/* SEARCH */
-.search-box{
-padding:10px;
-background:white;
-}
-
-.search-box input{
-width:100%;
-padding:10px;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
-/* CATEGORY */
 .categories{
 display:flex;
 overflow-x:auto;
@@ -70,7 +61,6 @@ gap:10px;
 padding:10px;
 background:#fff;
 }
-
 .cat-btn{
 padding:6px 12px;
 background:#eee;
@@ -79,128 +69,20 @@ white-space:nowrap;
 cursor:pointer;
 font-size:13px;
 }
-
 .cat-btn.active{
 background:#ff3d00;
 color:white;
-}
-
-/* PRODUCTS */
-.products{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
-}
-
-.card{
-background:white;
-border-radius:12px;
-padding:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.08);
-}
-
-.card img{
-width:100%;
-border-radius:8px;
-}
-
-.old-price{
-text-decoration:line-through;
-color:gray;
-font-size:13px;
-}
-
-.new-price{
-color:#e91e63;
-font-weight:bold;
-}
-
-.discount{
-background:#e91e63;
-color:white;
-font-size:11px;
-padding:2px 6px;
-border-radius:6px;
-display:inline-block;
-margin-top:4px;
-}
-
-.buy-btn{
-background:#000;
-color:white;
-text-align:center;
-padding:7px;
-border-radius:6px;
-margin-top:6px;
-cursor:pointer;
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-position:fixed;
-bottom:0;
-left:0;
-width:100%;
-background:linear-gradient(90deg,#ff3d00,#ff9100);
-display:flex;
-justify-content:space-around;
-padding:10px 0;
-}
-
-.bottom-nav a{
-color:white;
-text-decoration:none;
-font-size:13px;
-text-align:center;
-}
-
-.bottom-nav i{
-display:block;
-font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="logo">Shahin Tech BD</div>
-<div class="icons">
-<a href="https://wa.me/8801777127628"><i class="fab fa-whatsapp" style="color:#25D366"></i></a>
-<a href="https://t.me/shahintechbd_bot"><i class="fab fa-telegram" style="color:#0088cc"></i></a>
-</div>
-</header>
+<header>Shahin Tech BD</header>
 
-<div class="banner-slider">
-<div class="slide active">🔥 ধামাকা অফার চলছে 🔥</div>
-<div class="slide">🚀 নতুন পণ্য যুক্ত হয়েছে</div>
-<div class="slide">💥 আজই অর্ডার করুন বিশেষ ডিসকাউন্টে</div>
-<div class="slide">📦 সারাদেশে হোম ডেলিভারি</div>
-</div>
-
-<div class="search-box">
-<input type="text" id="searchInput" placeholder="Search product...">
-</div>
-
-<div class="categories">
-<div class="cat-btn active" onclick="filterCategory('All',this)">All</div>
-<div class="cat-btn" onclick="filterCategory('Wiring & Electrical',this)">Wiring</div>
-<div class="cat-btn" onclick="filterCategory('Mobile Phones',this)">Mobile</div>
-<div class="cat-btn" onclick="filterCategory('Mobile Accessories',this)">Accessories</div>
-<div class="cat-btn" onclick="filterCategory('General Electronics',this)">Electronics</div>
-<div class="cat-btn" onclick="filterCategory('Kitchen Appliances',this)">Kitchen</div>
-<div class="cat-btn" onclick="filterCategory('Gadgets & Smart Devices',this)">Smart</div>
-</div>
+<div class="categories" id="categoryBar"></div>
 
 <div class="products" id="products"></div>
-
-<div class="bottom-nav">
-<a href="index.html"><i class="fa fa-home"></i>Home</a>
-<a href="cart.html"><i class="fa fa-shopping-cart"></i>Cart</a>
-<a href="orders.html"><i class="fa fa-box"></i>Orders</a>
-<a href="account.html"><i class="fa fa-user"></i>Account</a>
-</div>
 
 <script>
 
@@ -212,61 +94,45 @@ fetch(API)
 .then(res=>res.json())
 .then(data=>{
 allProducts=data.filter(p=>p.status==="show");
+loadCategories();
 displayProducts(allProducts);
 });
+
+function loadCategories(){
+const categories=[...new Set(allProducts.map(p=>p.category))];
+let html=`<div class="cat-btn active" onclick="showAll(this)">All</div>`;
+categories.forEach(cat=>{
+html+=`<div class="cat-btn" onclick="filterCategory('${cat}',this)">${cat}</div>`;
+});
+document.getElementById("categoryBar").innerHTML=html;
+}
+
+function showAll(el){
+document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+el.classList.add("active");
+displayProducts(allProducts);
+}
+
+function filterCategory(cat,el){
+document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+el.classList.add("active");
+displayProducts(allProducts.filter(p=>p.category===cat));
+}
 
 function displayProducts(list){
 let container=document.getElementById("products");
 container.innerHTML="";
-
 list.forEach(p=>{
-let discount=0;
-if(p.oldprice && p.oldprice>p.newprice){
-discount=Math.round(((p.oldprice-p.newprice)/p.oldprice)*100);
-}
-
 container.innerHTML+=`
 <div class="card">
 <img src="${p.image}">
 <h4>${p.name}</h4>
 <div class="old-price">৳${p.oldprice}</div>
-<div class="new-price">৳${p.newprice}</div>
-<div class="discount">${discount}% OFF</div>
-<div class="buy-btn" onclick='viewProduct(${JSON.stringify(p)})'>Buy Now</div>
+<div class="new-price">৳${p.price}</div>
+<a href="product.html?id=${p.id}" class="buy-btn">Buy Now</a>
 </div>`;
 });
 }
-
-function filterCategory(cat,el){
-document.querySelectorAll(".cat-btn").forEach(btn=>btn.classList.remove("active"));
-el.classList.add("active");
-
-if(cat==="All"){
-displayProducts(allProducts);
-}else{
-displayProducts(allProducts.filter(p=>p.category===cat));
-}
-}
-
-document.getElementById("searchInput").addEventListener("input",function(){
-let value=this.value.toLowerCase();
-let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(value));
-displayProducts(filtered);
-});
-
-function viewProduct(p){
-localStorage.setItem("selectedProduct",JSON.stringify(p));
-window.location="product.html";
-}
-
-/* Banner Slider */
-let slides=document.querySelectorAll(".slide");
-let index=0;
-setInterval(()=>{
-slides[index].classList.remove("active");
-index=(index+1)%slides.length;
-slides[index].classList.add("active");
-},3000);
 
 </script>
 
