@@ -13,7 +13,6 @@ background:#f4f4f4;
 padding-bottom:280px;
 }
 
-/* PRODUCT AREA */
 .product-box{
 background:white;
 padding:15px;
@@ -21,9 +20,9 @@ padding:15px;
 
 .product-box img{
 width:100%;
-height:220px;
+height:230px;
 object-fit:cover;
-border-radius:10px;
+border-radius:12px;
 }
 
 .product-box h2{
@@ -32,7 +31,7 @@ margin:10px 0 5px;
 
 .price{
 color:#ff512f;
-font-size:20px;
+font-size:22px;
 font-weight:bold;
 }
 
@@ -42,7 +41,6 @@ color:gray;
 font-size:14px;
 }
 
-/* ORDER BOX */
 .order-box{
 position:fixed;
 bottom:0;
@@ -51,38 +49,36 @@ right:0;
 background:white;
 padding:15px;
 box-shadow:0 -3px 10px rgba(0,0,0,0.2);
-border-top-left-radius:15px;
-border-top-right-radius:15px;
+border-top-left-radius:20px;
+border-top-right-radius:20px;
 }
 
-/* QTY */
 .qty{
 display:flex;
 justify-content:center;
 align-items:center;
-gap:10px;
+gap:15px;
 margin:10px 0;
 }
 
 .qty button{
-padding:5px 12px;
+padding:6px 15px;
 font-size:18px;
 border:none;
 background:#ff512f;
 color:white;
-border-radius:5px;
+border-radius:6px;
 }
 
 .qty span{
-font-size:18px;
+font-size:20px;
 font-weight:bold;
 }
 
-/* INPUT */
-input, select{
+select{
 width:100%;
 padding:8px;
-margin:5px 0;
+margin:6px 0;
 border-radius:6px;
 border:1px solid #ccc;
 }
@@ -91,7 +87,7 @@ border:1px solid #ccc;
 background:#fff3e0;
 padding:8px;
 border-radius:6px;
-margin-top:5px;
+margin-top:6px;
 font-size:14px;
 }
 
@@ -103,7 +99,7 @@ background:#ff512f;
 color:white;
 border:none;
 border-radius:6px;
-font-size:15px;
+font-size:16px;
 }
 </style>
 </head>
@@ -113,6 +109,7 @@ font-size:15px;
 <div class="product-box" id="productDetails"></div>
 
 <div class="order-box">
+
 <div class="qty">
 <button onclick="decrease()">-</button>
 <span id="quantity">1</span>
@@ -127,11 +124,14 @@ font-size:15px;
 <div class="total" id="totalBox"></div>
 
 <button class="order-btn" onclick="placeOrder()">Place Order</button>
+
 </div>
 
 <script>
+
 const SHEET_URL="https://opensheet.elk.sh/1wrf-8XMPQ1xTcGUqQ20QxZI6dWvO-Osnp0Nd0FWS1wQ/Products";
-const ORDER_SCRIPT_URL="PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+const ORDER_SCRIPT_URL="https://script.google.com/macros/s/AKfycbxeUxtZOpRcyorV-cnbHyr82lgTUxTem6yn29d80qgKmrmWjqbV84NP6lhDkwcAWsWG/exec";
 
 let productData;
 let quantity=1;
@@ -174,7 +174,7 @@ updateTotal();
 
 function updateTotal(){
 deliveryCharge=parseInt(document.getElementById("delivery").value);
-let total=(productData.price*quantity)+deliveryCharge;
+let total=(parseFloat(productData.price)*quantity)+deliveryCharge;
 
 document.getElementById("totalBox").innerHTML=
 `Product: ৳${productData.price*quantity}<br>
@@ -213,6 +213,7 @@ alert("Order সফল হয়েছে ✅");
 window.location.href="index.html";
 });
 }
+
 </script>
 
 </body>
